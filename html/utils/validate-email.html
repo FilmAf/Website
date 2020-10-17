@@ -1,0 +1,305 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+define('CWndVal_MSG_NONE'		,     0);
+define('CWndVal_MSG_NOPENDING'	,     1);
+define('CWndVal_MSG_EMAILSENT'	,     2);
+define('CWndVal_MSG_VALIDATED'	,     3);
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+
+class CValidateEmail extends CWndDlgStep
+{
+    function constructor() // <<--------------------------------<< 1.0
+    {	global $_POST;
+
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_include_js		= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+
+		$this->mn_message			= CWndVal_MSG_NONE;
+		$this->mn_count				= 0;
+
+		if ( $this->mn_next_step == 0 )
+			$this->mb_resend_not_validate = dvdaf3_getvalue('cd', DVDAF3_GET) == 'resend';
+		else
+			$this->mb_resend_not_validate = array_key_exists('name', $_POST) && ! array_key_exists('val_cd', $_POST);
+		
+		$this->ms_title					= $this->mb_resend_not_validate ? "Resend Validation Code" : "Validate Email Address";
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= true;
+		$this->ma_steps[0]['validate']	= true;
+		$this->ma_steps[0]['redirect']	= '';
+		$this->ma_steps[1]				= array();
+		$this->ma_steps[1]['seed']		= false;
+		$this->ma_steps[1]['validate']	= false;
+		$this->ma_steps[1]['redirect']	= '';
+		$this->ma_steps[2]				= array();
+		$this->ma_steps[2]['seed']		= false;
+		$this->ma_steps[2]['validate']	= false;
+		$this->ma_steps[2]['redirect']	= $this->ms_base_subdomain;
+    }
+
+    function initStep_0()
+    {
+		$s_validate = dvdaf3_getvalue('id', DVDAF3_GET); if ( ! $s_validate ) $s_validate = dvdaf3_getvalue('name', DVDAF3_POST);
+		$s_validate = $s_validate ? "?id={$s_validate}&" : '?';
+		$s_validate = "/utils/validate-email.html{$s_validate}cd=resend";
+
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+		'name'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST|DVDAF3_LOWER,
+							 'label' => "User name".
+										"<p>".
+										  "If you forgot your user name you can <a href='/utils/find-account.html'>".
+										  "find your account based on your email address</a>. If you are not a Film Aficionado member ".
+										  "you can <a href='/utils/register.html'>quickly sign up for a free ".
+										  "account</a>. Don't worry, we do not spam.".
+"<div class='msgbox-a'><div class='msgbox-b'><div class='msgbox-c'><div class='msgbox-d'><div class='msgbox'>".
+"Hi, for some reason that escapes me our emails are not being delivered to hotmail.com -- if you need a new password and you registered with a hotmail address please contact us at <a href='http://dvdaf.net'>http://dvdaf.net</a>, <a href='http://www.facebook.com/filmafi'>Facebook</a> or <a href='https://twitter.com/dvdaf'>Twitter</a> until this problem is resolved.<br />&nbsp;<br />As there is no resolution in sight, you may want to post on <a href='http://answers.microsoft.com/thread/90aaa53c-1543-4a66-9aad-d0b38fd11720' target='hotmail'>this thread</a> for hotmail support to see that there are people being affected.".
+"</div></div></div></div></div>".
+										"</p>"),
+
+		'val_cd'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='12'", 'min' => 0, 'max' =>  8, 'uparm' => DVDAF3_POST,
+							 'label' => "Validation code".
+										"<p>".
+										  "The validation code you received from Film Aficionado. If you have not received it you can ".
+										  "<a href='$s_validate'>request a new confirmation email</a>.".
+										"</p>"),
+
+		'code_int'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='12'", 'min' => 0, 'max' =>  8, 'uparm' => DVDAF3_POST,
+							 'label' => "Security Code Confirmation".
+										"<p>".
+										  "Please enter the 6 characters shown in the image.<br />".
+										  "<img src='{$this->ms_base_subdomain}/icons/security-code.jpg?id=______' alt='Security code' />".
+										"</p>"),
+
+		'code_ext'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '0'),
+
+		'validate'	=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(array('type' => 'submit', 'name' => 'ok', 'value' => 'Validate code'          , 'onclick' => '')),
+							 'input' => CWnd_DLG_INPUT_BUTTONS),
+
+		'resend'	=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(
+										array('type' => 'button', 'name' => 'cancel', 'value' => 'No thanks, I changed my mind', 'onclick' => "history.go(-1)"),
+										array('type' => 'submit', 'name' => 'ok', 'value' => 'Resend validation email', 'onclick' => '')),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+
+		if ( $this->mb_resend_not_validate )
+		{
+			unset($this->ma_fields['val_cd']);
+			unset($this->ma_fields['validate']);
+		}
+		else
+		{
+			unset($this->ma_fields['resend']);
+		}
+
+		if ( $this->mn_next_step == 0 )
+		{
+			$this->ma_fields['name']['value'] = dvdaf3_getvalue('id', DVDAF3_GET);
+			if ( ! $this->mb_resend_not_validate )
+				$this->ma_fields['val_cd']['value'] = dvdaf3_getvalue('cd', DVDAF3_GET);
+		}
+
+		$this->ms_onsubmit = 'EmailValidation.validate()';
+    }
+
+    function resendEmail($s_name, $s_email)
+    {
+		$s_auth = CSecure::randEmail();
+		CSql::query_and_free("UPDATE dvdaf_user_2 SET email_validation_cd = '{$s_auth}' ".
+							  "WHERE user_id = '{$s_name}' and email_proposed <> '-'",
+							 0,__FILE__,__LINE__);
+		CEmail::sendValidation($s_name, $s_email, $s_auth);
+    }
+
+    function validateEmail($s_name)
+    {
+		CSql::query_and_free("UPDATE dvdaf_user_2 ".
+								"SET email_history = substr(concat(now(),'|',email_proposed,if(email_history = '-', '', concat('|',email_history))),1,500) ".
+							  "WHERE user_id = '{$s_name}' and email_proposed <> '-'",
+							 0,__FILE__,__LINE__);
+
+		CSql::query_and_free("UPDATE dvdaf_user_2 ".
+								"SET email = email_proposed, ".
+									"email_validated = 'Y', ".
+									"email_validation_cd = '-', ".
+									"email_proposed = '-', ".
+									"user_expire_tm = NULL ".
+							  "WHERE user_id = '{$s_name}' and email_proposed <> '-'",
+							 0,__FILE__,__LINE__);
+
+		CSql::query_and_free("INSERT INTO my_folder (user_id, folder, sort_category, sort_order, public_ind, edit_ind) ".
+							 "SELECT '{$s_name}', folder, sort_category, -1, public_ind, edit_ind ".
+							   "FROM folder_tmpl t ".
+							  "WHERE not exists (SELECT 1 FROM my_folder f WHERE t.folder = f.folder and user_id = '{$s_name}')",
+							 0,__FILE__,__LINE__);
+
+		$this->mn_message = CWndVal_MSG_VALIDATED;
+    }
+
+    function validateStep_0()
+    {	global $_POST;
+
+		CWndDlg::validateDataSubmission();
+		if ( $this->mn_action == CWnd_INPUT_GOOD )
+		{
+			$s_name       = $this->ma_fields['name']['value'];
+			$s_val_cd_1   = $this->mb_resend_not_validate ? '' : $this->ma_fields['val_cd']['value'];
+			$s_code_int   =		   $this->ma_fields['code_int']['value'];
+			$n_code_ext   = intval($this->ma_fields['code_ext']['value']);
+			$s_email_prop = '';
+			$s_val_cd_2	  = '';
+			$b_error_msg  = false;
+
+			if ( CForm::valSecurityCode($b_error_msg, $this->ma_fields['code_int'], $n_code_ext, $s_code_int) )
+			{
+				CSql::query_and_free	   ("DELETE a, b ".
+											  "FROM dvdaf_user a, dvdaf_user_2 b ".
+											 "WHERE a.user_id = b.user_id and b.user_expire_tm < now();",
+											0,__FILE__,__LINE__);
+
+				$rr = CSql::query_and_fetch("SELECT b.email_validation_cd, b.email_proposed ".
+											  "FROM dvdaf_user a JOIN dvdaf_user_2 b ON a.user_id = b.user_id ".
+											 "WHERE a.user_id = '{$s_name}'",
+											0,__FILE__,__LINE__);
+				if ( $rr )
+				{
+					$s_val_cd_2   = $rr['email_validation_cd'];
+					$s_email_prop = $rr['email_proposed'];
+
+					if ( $s_email_prop == '-' )
+					{
+						$this->mn_message = CWndVal_MSG_NOPENDING;
+					}
+					else
+					{
+						if ( ! $this->mb_resend_not_validate )
+							CForm::valEmailCode($b_error_msg, $this->ma_fields['val_cd'], $s_val_cd_1, $s_val_cd_2);
+					}
+				}
+				else
+				{
+					CForm::setUserNotFound($b_error_msg, $this->ma_fields['name'], $s_name);
+				}
+			}
+
+			if ( $b_error_msg )
+			{
+				$this->ms_error_msg = 'Please see below for details.';
+				$this->mn_action = CWnd_INPUT_ERROR;
+			}
+			else
+			{
+				$this->ms_new_user  = $s_name;
+				$this->ms_new_email = $s_email_prop;
+
+				if ( ! $this->mn_message )
+				{
+					if ( $this->mb_resend_not_validate )
+					{
+						$this->resendEmail($s_name, $s_email_prop);
+						$this->mn_message = CWndVal_MSG_EMAILSENT;
+					}
+					else
+					{
+						$this->validateEmail($s_name);
+					}
+				}
+			}
+		}
+    }
+
+    function initStep_1()
+    {
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '2'),
+
+		'no_pending'=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>Dear {$this->ms_new_user},</p>".
+										"<p>There are no pending email changes for your account.</p>"),
+
+		'email_sent'=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>Dear {$this->ms_new_user},</p>".
+
+										"<p>You will be getting a confirmation email at <strong>{$this->ms_new_email}</strong> in ".
+										"a few minutes.  Once you received it click on the link and your Film Aficionado membership or your ".
+										"new email address will be activated.</p>".
+
+										"<p>&nbsp;</p>".
+										"<p>All the best,</p>".
+										"<p>- The Film Aficionado Team.</p>".
+										"<p>&nbsp;</p>".
+
+										"<p><strong>If you can not find your validation email</strong>: Check your inbox and your ".
+										"junk mail folders. If it is not there in some 5-10 minutes then try sending an empty email ".
+										"to <strong>noreply@filmaf.com</strong>. This will attempt to tell your email program not to ".
+										"discard your registration confirmation. Then request a new validation email from the <a ".
+										"href='{$this->ms_base_subdomain}/utils/login.html'>login screen</a>. Note that after a day ".
+										"accounts that have not been validated are deleted, giving you a chance to try a different ".
+										"email address, etc.</p>"),
+
+		'validated'	=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>Dear {$this->ms_new_user},</p>".
+										"<p>Your email {$this->ms_new_email} has been validated.</p>"),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+
+		$s_id = dvdaf3_getvalue('name', DVDAF3_POST);
+		if ( $s_id )
+		{
+			if ( $this->mb_logged_in_this_sess && $this->ms_user_id != $s_id )
+			{
+				$this->mb_logged_in_this_sess = false;
+				$this->logoutUser();
+			}
+			$s_id = "?id={$s_id}";
+		}
+		else
+		{
+			$s_id = '';
+		}
+
+		if ( ! $this->mb_logged_in_this_sess			) $this->ma_fields['enter']['opt'][] = array('type' => 'button', 'name' => 'login'   , 'value' => 'Login'               , 'onclick' => "location.href=\"/utils/login.html{$s_id}\"");
+		if ( $this->mn_message == CWndVal_MSG_EMAILSENT	) $this->ma_fields['enter']['opt'][] = array('type' => 'button', 'name' => 'validate', 'value' => 'Validate now'        , 'onclick' => "location.href=\"/utils/validate-email.html?id={$this->ms_new_user}\"");
+														  $this->ma_fields['enter']['opt'][] = array('type' => 'button', 'name' => 'ok'      , 'value' => 'Continue to homepage', 'onclick' => "location.href=\"/\"");
+		if ( $this->mn_message != CWndVal_MSG_NOPENDING ) unset($this->ma_fields['no_pending']);
+		if ( $this->mn_message != CWndVal_MSG_EMAILSENT ) unset($this->ma_fields['email_sent']);
+		if ( $this->mn_message != CWndVal_MSG_VALIDATED ) unset($this->ma_fields['validated' ]);
+    }
+}
+
+new CValidateEmail;
+
+?>

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for i in `seq -f%03g 0 999`;
+do
+    mv -f *?$i.gif ./$i/.
+done
+

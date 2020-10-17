@@ -1,0 +1,57 @@
+#!/bin/bash
+
+function echo_usage {
+    echo ""
+    echo "This script (process-uploaded) will check on the image format and size and if appropriate generate a corresponding high quality jpg."
+    echo ""
+    if [ "$1" != '' ]; then
+	echo "ERROR:"
+	echo "    $1"
+	echo ""
+    fi
+    echo "Usage:"
+    echo "    $0 source base border preview"
+    echo ""
+    echo "Source:"
+    echo "    Uploaded picture temporary file including path and extension"
+    echo ""
+    echo "Base:"
+    echo "    Renamed picture including path and extension"
+    echo ""
+    echo "Border:"
+    echo "    Uploaded picture with border including path and extension"
+    echo ""
+    echo "Preview:"
+    echo "    Preview of processed uploaded picture"
+    echo ""
+    exit
+}
+
+if [ ! -f "$1" ]; then
+    echo_usage "$1 not found."
+fi
+
+if [ "$2" = "" ]; then
+    echo_usage "Target file not specified."
+fi
+
+if [ "$3" = "" ]; then
+    echo_usage "Target file not specified."
+fi
+
+if [ "$4" = "" ]; then
+    echo_usage "Target file not specified."
+fi
+
+load_pic=$1
+base_pic=$2
+bord_pic=$3
+prev_pic=$4
+
+#echo "/var/www/html/shell/identify-upload $load_pic $base_pic `identify -format '%m %w %h' $load_pic`"
+#echo "/var/www/html/shell/create-p4-like $base_pic $bord_pic"
+#echo "/var/www/html/shell/try-transform $base_pic $prev_pic nb"
+/var/www/html/shell/identify-upload $load_pic $base_pic `identify -format "%m %w %h" $load_pic`
+/var/www/html/shell/create-p4-like $base_pic $bord_pic
+/var/www/html/shell/try-transform $base_pic $prev_pic nb
+

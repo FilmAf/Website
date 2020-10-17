@@ -1,0 +1,63 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWnd.php';
+
+class CRedirect extends CWnd
+{
+    function constructor()
+    {
+		CWnd::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title	= 'Film Aficionado';
+		$this->ms_trg	= dvdaf3_getvalue('trg',DVDAF3_GET);
+		$this->ms_msg	= html_entity_decode(dvdaf3_getvalue('msg',DVDAF3_GET));
+
+		if ( ! $this->ms_trg ) $this->ms_trg = $this->ms_base_subdomain;
+    }
+
+	function drawHead()
+	{
+		echo
+			"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>\n".
+			"<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>\n".
+			"<!--\n".
+			"\n".
+            "Film Aficionado is public domain software. Promotional material images,\n".
+            "if present, are copyrighted by the respective copyright owners and should\n".
+            "only be used under the provisions dictated by those copyright holders.\n".
+            "There are no warranties expressed on implied.\n".
+			"\n".
+			"-->\n".
+			"<head>".
+			  "<title>{$this->ms_title}</title>".
+			  "<link rel='shortcut icon' href='/favicon.ico' />".
+			  "<meta http-equiv='Content-type' content='text/html; charset=UTF-8' />".
+			  "<meta http-equiv='refresh' content='2; url={$this->ms_trg}' />".
+			  $this->ms_include_css.
+			"</head>\n";
+	}
+
+	function drawBodyPage()
+	{
+		echo  "<div class='msgbox-a' style='margin-top:80px;margin-bottom:40px'><div class='msgbox-b'><div class='msgbox-c'><div class='msgbox-d'>".
+				"<div class='msgbox'>".
+				  "<div id='msg-what'>{$this->ms_msg}</div>".
+				  "<div style='margin-top:20px'>Please wait while we transfer you...</div>".
+				  "<div><small>(<a href='{$this->ms_trg}' style='text-decoration:underline'>Or click here if you do not wish to wait</a>)</small></div>".
+				"</div>".
+			  "</div></div></div></div>";
+	}
+}
+
+new CRedirect;
+
+?>

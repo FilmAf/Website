@@ -1,0 +1,78 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+
+class CPrivacy extends CWndDlgStep
+{
+	function constructor() // <<--------------------<< 1.0
+	{
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title					= 'Terms of Service';
+		$this->ms_include_js			= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= false;
+		$this->ma_steps[0]['validate']	= false;
+		$this->ma_steps[0]['redirect']	= '';
+	}
+
+	function initStep_0()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+		'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>No person under the age of 14 (13 years old ".
+										"and younger) may register and or maintain an account (membership, login, ".
+										"id, etc.) in this site. By registering or maintaining an account you are, ".
+										"under penalties of perjury, affirming that you are 14 years old or older.".
+										"</p>".
+
+										"<p>By using this site, registering or maintaining ".
+										"an account (either of the three) you are also declaring that you agree not ".
+										"to hold us responsible for damages you may suffer in connection with this ".
+										"site or the information it provides or hosts. By &quot;us&quot; we mean and ".
+										"any persons or entities associated with the creation, distribution, ".
+										"provision of services or any other activity related to this site.</p>".
+
+										"<p>You also agree to allow us to show your folders ".
+										"and corresponding titles to others. We will not sell your email address to ".
+										"other companies. However, there are no guaranties that the information will ".
+										"not become public. If that happens for any reason you agree not to hold us ".
+										"responsible or liable for any damages. We also reserve the right to ".
+										"unilaterally terminate accounts.</p>".
+
+										"<p>We forfeit any responsibility on the accuracy ".
+										"or correctness of the information in this site. Do not trust the pictures, ".
+										"descriptions and other information associated with a title as accurate or ".
+										"reflecting the item pointed by the links to retailers we provide.</p>".
+
+										"<p>This statement was last updated on October 10, 2020.</p>"),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(array('type' => 'button', 'name' => 'ok', 'value' => 'Back to homepage', 'onclick' => "location.href=\"/\"")),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+	}
+}
+
+new CPrivacy;
+
+?>

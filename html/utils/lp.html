@@ -1,0 +1,56 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CPicUtils.php';
+
+function echoHeader($s_title)
+{
+	header('Expires: Wed, 1 Jan 2012 05:00:00 GMT');				// date in the past
+	header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');		// always modified
+	header('Cache-Control: no-store, no-cache, must-revalidate');	// HTTP/1.1
+	header('Cache-Control: post-check=0, pre-check=0', false);
+	header('Pragma: no-cache');										// HTTP/1.0
+
+	echo
+	"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'DTD/xhtml1-transitional.dtd'>\n".
+	"<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>\n".
+	"<!--\n".
+	"\n".
+	"Film Aficionado is public domain software. Promotional material images,\n".
+	"if present, are copyrighted by the respective copyright owners and should\n".
+	"only be used under the provisions dictated by those copyright holders.\n".
+	"There are no warranties expressed on implied.\n".
+	"\n".
+	"-->\n".
+	"<head>".
+	"<title>{$s_title}</title>".
+	"<meta http-equiv='Content-type' content='text/html; charset=UTF-8' />".
+	"</head>\n";
+}
+
+function echoBody($s_pic, $n_bord)
+{
+	$s_src = is_numeric($s_pic) ? ( $n_bord ? "/uploads/{$s_pic}-bord.jpg" : "/uploads/{$s_pic}-prev.jpg")
+								: CPic::location($s_pic, $n_bord ? CPic_BORDER : CPic_PIC);
+	echo
+	"<body onload='self.focus()'>".
+	  "<div style='margin:10px 10px 10px 10px;text-align:center'><img src='{$s_src}' /></div>".
+	"</body>".
+	"</html>";
+}
+
+
+$s_pic  = dvdaf3_getvalue('pic' , DVDAF3_GET);
+$n_bord = dvdaf3_getvalue('bord', DVDAF3_GET|DVDAF3_INT);
+
+echoHeader("FilmAf Picture {$s_pic}");
+echoBody($s_pic, $n_bord);
+
+?>

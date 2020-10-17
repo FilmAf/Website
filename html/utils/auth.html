@@ -1,0 +1,105 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CLogin.php';
+
+class CAuth extends CLogin
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		parent::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+
+		// configurable parameters
+		switch ( dvdaf3_getvalue('ret', DVDAF3_GET) )
+		{
+		case 'bugs':
+			switch ( $this->ms_base_subdomain )
+			{
+			case 'http://www.filmaf.edu':
+				$this->ms_stealth_auth	= 'http://192.168.1.13/auth.php';
+				$this->ms_auth_redirect	= $this->ms_base_subdomain . '/auth.php';
+				break;
+			default:
+				$this->ms_stealth_auth	= 'http://bugs.dvdaf.org/auth.php';
+				$this->ms_auth_redirect	= 'http://bugs.dvdaf.org/auth.php';
+				break;
+			}
+			$this->ms_form_action      .= '?ret=bugs&seed='. dvdaf3_getvalue('seed', DVDAF3_GET);
+			break;
+		}
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= false;
+		$this->ma_steps[0]['validate']	= true;
+		$this->ma_steps[0]['redirect']	= '';
+		$this->ma_steps[1]				= array();
+		$this->ma_steps[1]['seed']		= false;
+		$this->ma_steps[1]['validate']	= false;
+		$this->ma_steps[1]['redirect']	= '';
+	}
+
+	function redirectToCaller()
+	{
+		$s_email = CSql::query_and_fetch1("SELECT email FROM dvdaf_user_2 WHERE user_id = '{$this->ms_user_id}'", 0,__FILE__,__LINE__);
+		if ( $s_email )
+		{
+			// tell caller about user
+			$s_md5_prefix = '0k1[LT,CujpqL6C&2u,V)^S<';
+			$s_seed	  = dvdaf3_getvalue('seed', DVDAF3_GET);
+			$s_check	  = md5($s_md5_prefix . $s_seed . $this->ms_user_id . $s_email);
+			$s_url	  = $this->ms_stealth_auth . "?seed={$s_seed}&uname={$this->ms_user_id}&email={$s_email}&check={$s_check}";
+
+			file_get_contents($s_url);
+
+			// redirect back to caller
+			$s_check		    = md5($s_md5_prefix . $s_seed);
+			$this->ms_good_redirect = $this->ms_auth_redirect . "?auth={$s_seed}&check={$s_check}";
+		}
+	}
+
+	function initStep_0()
+	{
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+
+		if ( dvdaf3_getvalue('logout', DVDAF3_GET) )
+		{
+		}
+		else
+		{
+			if ( $this->mn_next_step == 0 && $this->ms_user_id && $this->mb_logged_in )
+			{
+				$this->redirectToCaller();
+				$this->ms_redirect = $this->ms_good_redirect;
+			}
+			else
+			{
+				parent::initStep_0();
+			}
+		}
+	}
+
+	function validateStep_0()
+	{
+		CWndDlg::validateDataSubmission();
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+
+		parent::validateStep_0();
+
+		if ( $this->ms_user_id && $this->mb_logged_in )
+			$this->redirectToCaller();
+	}
+}
+
+new CAuth;
+
+?>

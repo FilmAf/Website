@@ -1,0 +1,131 @@
+#!/bin/bash
+
+#p0/###    small                *.gif +++ already populated
+#p1/###    medium               *.jpg --- to be populated
+#p2/###    large                *.jpg -
+#p3/###    huge                 *.jpg -
+#p4/###    original display     *.jpg --- to be populated
+#p5/###    edited               *.pgn
+#p6/###    original             *.jpg +++
+#uploads   unprocessed pics     *.jpg, *.gif, *.bmp, *.png
+
+function echo_usage {
+    echo ""
+    echo "This script will apply a series of transformations to [source] saving them to [target] (format equivalent to -1) generating an intermediate miff file in the same folder as [target]."
+    echo ""
+    if [ "$1" != '' ]; then
+	echo "ERROR:"
+	echo "    $1"
+	echo ""
+    fi
+    echo "Usage:"
+    echo "    $0 [source] [target] [bo|nb|hd|bd|kr|kw|sc] transform instructions..."
+    echo ""
+    echo "Source:"
+    echo "    Full name of the source image including path and extension"
+    echo ""
+    echo "Target:"
+    echo "    Full name of the target file image including path and extension... which should be jpg"
+    echo ""
+    echo "Treatment:"
+    echo "    bo = dvd-cover-with-borders"
+    echo "    nb = dvd-cover-without-borders"
+    echo "    hd = hd-dvd"
+    echo "    bd = blu-ray"
+    echo "    kr = keep-ratio (cds, squarier and thinnier images)"
+    echo "    kw = keep-ratio-white-bars (deprecated)"
+    echo "    sc = screen-capture"
+    echo ""
+    echo "Transform instructions"
+    echo "    autocrop [0..100]"
+    echo "    rotate [0..360]"
+    echo "    crop_x1 [1..]"
+    echo "    crop_x2 [1..]"
+    echo "    crop_y1 [1..]"
+    echo "    crop_y2 [1..]"
+    echo "    black [0..100]"
+    echo "    white [0..100]"
+    echo "    gamma [0..3]"
+    echo "    restore"
+    echo ""
+    exit
+}
+
+#input file
+src=$1
+if [ ! -f "$src" ]; then
+    echo_usage "$src not found."
+fi
+shift
+
+#output file
+ext=$[${#1}-3]
+trg=$[${#1}-4]
+ext="${1:$ext:3}"
+trg="${1:0:$trg}"
+mid=''
+gif=''
+if [ "$trg" != "" ]; then
+    if [ "$ext" != "jpg" ]; then
+	echo_usage "Target file must be a jpg."
+    else
+	mid="$trg.miff"
+	gif="$trg.gif"
+	trg="$trg.$ext"
+    fi
+else
+    echo_usage "Target file not specified."
+fi
+shift
+
+#get type of processing
+ou=''
+if [ "$1" = "bo" -o "$1" = "nb" -o "$1" = "hd" -o "$1" = "bd" -o "$1" = "kr" -o "$1" = "kw" -o "$1" = "sc" ]; then
+    ou="$1"
+else
+    echo_usage "$1 is an unknow output parameter"
+fi
+shift
+
+#generate transform
+del=''
+if [ "$*" != "" ]; then
+    echo /var/www/html/shell/transform $src $mid $*
+    /var/www/html/shell/transform $src $mid $*
+    del=$mid
+else
+    mid=$src
+fi
+
+#write small *.gif
+cmd=''
+case "$ou" in
+"bo" | "nb"        ) cmd='-resize 63x90!'; ;;
+"hd" | "bd" | "kw" ) cmd='-resize 63x80! miff:- | composite - -size  63x90 xc:white -gravity center'; ;;
+"kr"               ) cmd='-resize 63x80 miff:- | composite - -size  63x90 xc:white -gravity center'; ;;
+"sc"               ) cmd='-resize 120x68 miff:- | composite - -size 120x68 xc:black -gravity center'; ;;
+esac;
+if [ "$cmd" != "" ]; then
+    eval "convert $mid $cmd $gif"
+    chmod 666 "$gif" 2> /dev/null
+fi
+
+#write medium-sized *.jpg
+cmd=''
+case "$ou" in
+"bo"        ) cmd='-resize 298x423! -bordercolor "#cccccc" -border 1x1'; ;;
+"nb"        ) cmd='-resize 300x425!'; ;;
+"hd" | "bd" ) cmd='-resize 300x390!'; ;;
+"kr"        ) cmd='-resize 300x425' ; ;;
+"kw"        ) cmd='-resize 300x425 miff:- | composite - -size 300x425 xc:white -gravity center'; ;;
+"sc"        ) cmd='-resize 480x270 miff:- | composite - -size 480x270 xc:black -gravity center'; ;;
+esac;
+if [ "$cmd" != "" ]; then
+    eval "convert $mid $cmd miff:- | composite -gravity south -geometry +2-14 -dissolve 70 -type TruecolorMatte /var/www/html/icons/copy.miff - -quality 90 $trg"
+    chmod 666 "$trg" 2> /dev/null
+fi
+
+if [ "$del" != "" ]; then
+    rm -f "$mid" 2> /dev/null
+fi
+

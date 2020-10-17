@@ -1,0 +1,15 @@
+#!/bin/bash
+
+for k in `seq -f%01g 1 5`;
+do
+    for i in `seq -f%03g 0 999`;
+    do
+	cd /var/www/html/p$k/$i
+	pwd
+	for j in `ls *.jpg | awk --field-separator . '{print substr($0,3,6)}'`
+	do
+	    mv d-${j}-0.jpg ${j}-d0.jpg
+	done
+    done
+done
+

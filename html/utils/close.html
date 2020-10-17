@@ -1,0 +1,39 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlg.php';
+
+class CClose extends CWndDlg
+{
+	function constructor() // <<--------------------<< 1.0
+	{
+		CWndDlg::constructor();
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->mn_header_type	= CWnd_HEADER_SMALL;
+
+		switch ( dvdaf3_getvalue('msg', DVDAF3_INT | DVDAF3_GET) )
+		{
+		case 1:  $this->ms_msg = 'Authentication Successful'; break;
+		default: $this->ms_msg = 'Success'; break;
+		}
+	}
+
+	function drawBodyPage() // <<-------------------------------<< 7.2
+	{
+		echo  "<div style='text-align:center'>".
+				"<div style='padding:36px 0 0 0'>{$this->ms_msg}</div>".
+				"<div style='padding:18px 0 10px 0'><input id='close' type='button' value='Close this window' onclick='return window.close()' /></div>".
+			  "</div>";
+	}
+}
+
+new CClose;
+
+?>

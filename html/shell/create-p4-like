@@ -1,0 +1,37 @@
+#!/bin/bash
+
+function echo_usage {
+    echo ""
+    echo "This script will add borders to an uploaded picture."
+    echo ""
+    if [ "$1" != '' ]; then
+	echo "ERROR:"
+	echo "    $1"
+	echo ""
+    fi
+    echo "Usage:"
+    echo "    $0 [source] [target]"
+    echo ""
+    echo "Source:"
+    echo "    Full name of the source image including path and extension"
+    echo ""
+    echo "Target:"
+    echo "    Full name of the target file image including path and extension... which should be jpg"
+    echo ""
+    exit
+}
+
+#input file
+src=$1
+if [ ! -f "$src" ]; then
+    echo_usage "$src not found."
+fi
+
+trg=$2
+if [ "$trg" = "" ]; then
+    echo_usage "Target file not specified."
+fi
+
+eval "convert $src -border 15x15 miff:- | composite -gravity northeast /var/www/html/icons/checker-v.gif - miff:- | composite -gravity northwest /var/www/html/icons/checker-v.gif - miff:- | composite -gravity southwest /var/www/html/icons/checker-h.gif - miff:- | composite -gravity northwest /var/www/html/icons/checker-h.gif - miff:- | composite -gravity center -dissolve 40 -type TruecolorMatte /var/www/html/icons/filmaf.miff - -quality 90 $trg"
+
+chmod 666 "$trg" 2> /dev/null

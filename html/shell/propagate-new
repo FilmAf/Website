@@ -1,0 +1,125 @@
+#!/bin/bash
+
+#p0/###    small                *.gif +++ already populated
+#p1/###    medium               *.jpg --- to be populated
+#p2/###    large                *.jpg -
+#p3/###    huge                 *.jpg -
+#p4/###    original display     *.jpg --- to be populated
+#p5/###    edited               *.pgn
+#p6/###    original             *.jpg +++
+#uploads   unprocessed pics     *.jpg, *.gif, *.bmp, *.png
+
+function echo_usage {
+    echo ""
+    echo "This script will apply a series of transformations to a p6 image, storing the result in p5 and propagating the changes to p0 thru p4.  If there are no transformations to be applied p0 thru p3 will be generated directly from p6.  p4 is always generated directly from p6."
+    echo ""
+    if [ "$1" != '' ]; then
+	echo "ERROR:"
+	echo "    $1"
+	echo ""
+    fi
+    echo "Usage:"
+    echo "    $0 [filename] [bo|nb|hd|bd|kr|kw|sc] transform instructions..."
+    echo ""
+    echo "Filename:"
+    echo "    Image to be processed (no path and no extension) as in 002000-d0"
+    echo ""
+    echo "Treatment:"
+    echo "    bo = dvd-cover-with-borders"
+    echo "    nb = dvd-cover-without-borders"
+    echo "    hd = hd-dvd"
+    echo "    bd = blu-ray"
+    echo "    kr = keep-ratio (cds, squarier and thinnier images)"
+    echo "    kw = keep-ratio-white-bars (deprecated)"
+    echo "    sc = screen-capture"
+    echo ""
+    echo "Transform instructions"
+    echo "    autocrop [0..100]"
+    echo "    rotate [0..360]"
+    echo "    crop_x1 [1..]"
+    echo "    crop_x2 [1..]"
+    echo "    crop_y1 [1..]"
+    echo "    crop_y2 [1..]"
+    echo "    black [0..100]"
+    echo "    white [0..100]"
+    echo "    gamma [0..3]"
+    echo "    restore"
+    echo ""
+    exit
+}
+
+#get file to process "002000-d0"
+dir="${1:3:3}"
+nam="$1"
+ori="/var/www/html/p6/$dir/$nam.jpg"
+shift
+
+if [ "$1" = "" ]; then
+    echo_usage
+fi
+
+if [ ! -f "$ori" ]; then
+    echo_usage "$ori not found."
+fi
+
+#get type of processing
+ou=''
+if [ "$1" = "bo" -o "$1" = "nb" -o "$1" = "hd" -o "$1" = "bd" -o "$1" = "kr" -o "$1" = "kw" -o "$1" = "sc" ]; then
+    ou="$1"
+else
+    echo_usage "$1 is an unknow output parameter"
+fi
+shift
+
+#delete old versions
+rm -f /var/www/html/p0/$dir/$nam.gif
+rm -f /var/www/html/p1/$dir/$nam.jpg
+rm -f /var/www/html/p2/$dir/$nam.jpg
+rm -f /var/www/html/p3/$dir/$nam.jpg
+rm -f /var/www/html/p4/$dir/$nam.jpg
+rm -f /var/www/html/p5/$dir/$nam.jpg
+
+#generate transform
+if [ "$1" != "" ]; then
+    src="/var/www/html/p5/$dir/$nam.jpg"
+    eval "/var/www/html/shell/transform $ori $src $*"
+    chmod 666 $src 2> /dev/null
+else
+    src="$ori"
+fi
+
+#propagate to p0/### small *.gif
+cmd=''
+case "$ou" in
+"bo" | "nb"        ) cmd='-resize 63x90!'; ;;
+"hd" | "bd" | "kw" ) cmd='-resize 63x80! miff:- | composite - -size  63x90 xc:white -gravity center'; ;;
+"kr"               ) cmd='-resize 63x80 miff:- | composite - -size  63x90 xc:white -gravity center'; ;;
+"sc"               ) cmd='-resize 120x68 miff:- | composite - -size 120x68 xc:black -gravity center'; ;;
+esac;
+if [ "$cmd" != "" ]; then
+    eval "convert $src $cmd /var/www/html/p0/$dir/$nam.gif"
+    chmod 666 "/var/www/html/p0/$dir/$nam.gif" 2> /dev/null
+fi
+
+#propagate to p1/### medium *.jpg
+cmd=''
+case "$ou" in
+"bo"        ) cmd='-resize 298x423! -bordercolor "#cccccc" -border 1x1'; ;;
+"nb"        ) cmd='-resize 300x425!'; ;;
+"hd" | "bd" ) cmd='-resize 300x390!'; ;;
+"kr"        ) cmd='-resize 300x425' ; ;;
+"kw"        ) cmd='-resize 300x425 miff:- | composite - -size 300x425 xc:white -gravity center'; ;;
+"sc"        ) cmd='-resize 480x270 miff:- | composite - -size 480x270 xc:black -gravity center'; ;;
+esac;
+if [ "$cmd" != "" ]; then
+    eval "convert $src $cmd miff:- | composite -gravity south -geometry +2-14 -dissolve 70 -type TruecolorMatte /var/www/html/icons/copy.miff - -quality 90 /var/www/html/p1/$dir/$nam.jpg"
+    chmod 666 "/var/www/html/p1/$dir/$nam.jpg" 2> /dev/null
+fi
+
+#propagate to p2/### large *.jpg
+#propagate to p3/### huge *.jpg
+
+#propagate to p4/### original display *.jpg
+eval "convert $ori -border 15x15 miff:- | composite -gravity northeast /var/www/html/icons/checker-v.gif - miff:- | composite -gravity northwest /var/www/html/icons/checker-v.gif - miff:- | composite -gravity southwest /var/www/html/icons/checker-h.gif - miff:- | composite -gravity northwest /var/www/html/icons/checker-h.gif - miff:- | composite -gravity center -dissolve 40 -type TruecolorMatte /var/www/html/icons/filmaf.miff - -quality 90 /var/www/html/p4/$dir/$nam.jpg"
+chmod 666 "/var/www/html/p4/$dir/$nam.jpg" 2> /dev/null
+

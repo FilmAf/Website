@@ -1,0 +1,67 @@
+#!/bin/bash
+
+function echo_usage {
+    echo ""
+    echo "This script (process-social-pic) will check on the image format and size and if appropriate generate a corresponding high quality jpg."
+    echo ""
+    if [ "$1" != '' ]; then
+	echo "ERROR:"
+	echo "    $1"
+	echo ""
+    fi
+    echo "Usage:"
+    echo "    $0 action source target"
+    echo ""
+    echo "Action:"
+    echo "    One of 'profile' or 'blog'"
+    echo ""
+    echo "Source:"
+    echo "    Uploaded picture temporary file including path and extension"
+    echo ""
+    echo "Target:"
+    echo "    Renamed picture including path, but no extension ('-p.jpg', '-t.jpg' will be appended for 'profile')"
+    echo ""
+    exit
+}
+
+case "$1" in
+"profile") ;;
+"blog" ) ;;
+*     ) echo_usage "$1 is not a supported action"; ;;
+esac
+
+if [ ! -f "$2" ]; then
+    echo_usage "$src not found."
+fi
+
+if [ "$3" = "" ]; then
+    echo_usage "Target file not specified."
+fi
+
+action_pic=$1
+source_pic=$2
+target_pic=$3
+format_pic=`identify -format "%m" $source_pic`
+
+case "$format_pic" in
+"JPEG") ;;
+"GIF" ) ;;
+"BMP" ) ;;
+"PNG" ) ;;
+*     ) echo_usage "$format_pic is not a supported image type"; ;;
+esac
+
+case "$action_pic" in
+"profile")
+    convert $source_pic -resize '@40000>' -quality 90 "$target_pic"_p.jpg
+    convert $source_pic -resize '64x64>' -quality 90 "$target_pic"_t.jpg
+    chmod 666 "$target_pic"_p.jpg "$target_pic"_t.jpg 2> /dev/null
+ ;;
+"blog" )
+    convert $source_pic -resize '@40000>' -quality 90 "$target_pic".jpg
+    chmod 666 $target_pic.jpg 2> /dev/null
+ ;;
+esac
+
+echo SUCCESS
+

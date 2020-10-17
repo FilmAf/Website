@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -d "$1/000" ]; then
+    cd "$1"
+else
+    echo "This script chmod's a 000..999 folder structure. Files are chmod'ed to 644 and directories to 755"
+    echo "Usage: $0 [folder where 000..999 tree exists]"
+    exit
+fi
+
+for i in `seq -f%03g 0 999`;
+do
+    chmod 644 ./$i/*
+    chmod 755 ./$i
+done
+

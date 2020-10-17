@@ -1,0 +1,116 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWnd.php';
+
+class CErrorLog extends CWnd
+{
+    function constructor()
+    {
+		CWnd::constructor();
+		$this->ms_title				= 'FilmAf Error Log';
+		$this->mb_get_user_status	= true;
+    }
+
+	function drawBodyPage()
+	{
+		if ( ! $this->mb_mod )
+		{
+			$this->ms_display_error = "This function is only available to modetators.";
+			$this->drawMessages(true,false);
+			return;
+		}
+
+		$s_url	= dvdaf3_getvalue('SCRIPT_URL',DVDAF3_SERVER);
+		$s_ip	= dvdaf3_getvalue('ip'  ,DVDAF3_GET);
+		$n_time	= dvdaf3_getvalue('time',DVDAF3_GET|DVDAF3_INT);
+		$n_from	= dvdaf3_getvalue('from',DVDAF3_GET|DVDAF3_INT);
+		$n_to	= dvdaf3_getvalue('to'  ,DVDAF3_GET|DVDAF3_INT);
+		$n_max  = CSql::query_and_fetch1("SELECT MAX(msg_id) FROM error_log",0,__FILE__,__LINE__);
+
+		$ss  = "SELECT msg_id, remote_ip, request_tm, msg FROM error_log WHERE ";
+		$str = '';
+
+		if ( $s_ip && $n_time )
+		{
+			$str    = "for IP = {$s_ip} and time = {$n_time}";
+			$ss    .= "remote_ip = '{$s_ip}' and request_tm = {$n_time}";
+			$n_from	= '';
+			$n_to   = '';
+		}
+		else
+		{
+			if ( $n_from >= 0 && $n_to > 0 && $n_to >= $n_from && $n_to - $n_from < 10 )
+			{
+				$str    = "for msg_id between {$n_from} and {$n_to}";
+				$ss    .= "msg_id >= {$n_from} and msg_id <= {$n_to}";
+				$s_ip   = '';
+				$n_time	= '';
+			}
+			else
+			{
+				$s_ip   = '';
+				$n_time	= '';
+				$n_from	= '';
+				$n_to   = '';
+			}
+		}
+
+		echo  "<h1>Error Log</h1>".
+			  "<div style='margin:20px'>".
+				"<form action='{$s_url}' method='get'>".
+				  "<table class='no_border' style='margin:20px 0 20px 0'>".
+					"<tr>".
+						"<td style='padding:2px'>IP:</td>".
+						"<td style='padding:2px'><input type='text' name='ip' id='ip' value='{$s_ip}' /></td>".
+						"<td style='padding:2px 20px 2px 20px'>or</td>".
+						"<td style='padding:2px'>Message id from:</td>".
+						"<td style='padding:2px'><input type='text' name='from' id='from' value='{$n_from}' /></td>".
+						"<td>&nbsp;</td>".
+					"</tr>".
+					"<tr>".
+						"<td style='padding:2px;vertical-align:top'>Time:</td>".
+						"<td style='padding:2px;vertical-align:top'><input type='text' name='time' id='time' value='{$n_time}' /></td>".
+						"<td>&nbsp;</td>".
+						"<td style='padding:2px;vertical-align:top'>to:</td>".
+						"<td style='padding:2px;vertical-align:top'><input type='text' name='to' id='to' value='{$n_to}' /></td>".
+						"<td style='padding:2px 0 2px 20px;vertical-align:top'>".
+						  "<input type='submit' name='go' value='Submit' />".
+						  "&nbsp;".
+						  "<input type='button' name='clear' value='Clear' onclick='".
+							"document.getElementById(\"ip\").value = ".
+							"document.getElementById(\"time\").value = ".
+							"document.getElementById(\"from\").value = ".
+							"document.getElementById(\"to\").value = \"\";' />".
+						"</td>".
+					"</tr>".
+				  "</table>".
+				  "<ul style='margin-left:30px'>".
+					"<li>Time must be submitted in UNIX format. Use <a href='http://www.epochconverter.com/' target='_blank'>this calculator</a> to convert UNIX time.</li>".
+					"<li>Up to 10 messages can be requested.</li>".
+					"<li>The most recent message id is {$n_max}.</li>".
+				  "</ul>".
+				"</form>";
+
+		if ( $str )
+		{
+			echo "<h2>Error log {$str}.</h2>";
+			if ( ($rr = CSql::query($ss,0,__FILE__,__LINE__)) )
+				while ( ($rt = @mysql_fetch_assoc($rr)) )
+					echo  "<div style='margin:20px 0 20px 0'><div>msg_id = [{$rt['msg_id']}]</div>".$rt['msg']."</div><div class='ruler'>&nbsp;</div>";
+		}
+
+		echo  "</div>";
+	}
+}
+
+new CErrorLog;
+
+?>

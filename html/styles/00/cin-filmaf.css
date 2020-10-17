@@ -1,0 +1,323 @@
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+/* Generic */
+body									{color:#072b4b;		background:#e6e6e6;			margin:0; padding:0; font-family:verdana,arial,helvetica; font-weight:normal; font-size:11px; text-decoration:none; }
+table									{												margin:0; padding:0; border-collapse:collapse; }
+td, form, ol, ul, p						{												margin:0; padding:0; }
+img										{												margin:0; padding:0; border:none; }
+input, select, textarea					{color:#2c75b7;									font-family:verdana,arial,helvetica; font-weight:normal; font-size:11px; text-decoration:none; }
+input.ronly, textarea.ronly				{color:#999999;		background:#eeeeee;			}
+input[type='text'], select, textarea	{border-color:#abadb3 #dbdfe6 #e3e9ef #e2e3ea;	border:solid 1px; }
+small									{												font-size:9px; }
+h1, h2, h3, h4, h5, h6					{												margin:0; padding:0; font-family:verdana,arial,helvetica; font-weight:normal; font-size:11px; text-decoration:none; }
+a:link, a:visited, a:active				{color:#2c75b7;									text-decoration:none; }
+a:hover									{color:#8fbde7;									text-decoration:underline; }
+/* Corners */
+#corner									{												background:transparent; padding:0 0 0 2px; }
+/*
+.corner-r								{												background:url("http://dv1.us/d1/00/corner_r.png" ) repeat-y right; padding-right:7px; }
+.corner-l								{												background:url("http://dv1.us/d1/00/corner_l.png" ) repeat-y top left; padding-left:7px; }
+*/
+.corner-r								{												padding-right:7px; }
+.corner-l								{												padding-left:7px; }
+.corner-tl								{												background:url("http://dv1.us/d1/00/corner_tl.png") 0 0 no-repeat; height:26px; }
+.corner-tr								{												background:url("http://dv1.us/d1/00/corner_tr.png") 100% 0 no-repeat; height:26px; }
+.corner-t								{												background:url("http://dv1.us/d1/00/corner_t.png" ) repeat-x; height:26px; }
+.corner-bl								{												background:url("http://dv1.us/d1/00/corner_bl.png") 0 0 no-repeat; height:106px; }
+.corner-br								{												background:url("http://dv1.us/d1/00/corner_br.png") 100% 0 no-repeat; height:106px; }
+.corner-b								{												background:url("http://dv1.us/d1/00/corner_b.png" ) repeat-x; height:106px; }
+.corner-c								{					background:#ffffff;			}
+/* Header */
+#header									{												background:transparent url("http://dv1.us/d1/00/header-back.jpg") repeat-x; height:94px; width:100%; }
+#header-small							{												background:transparent url("http://dv1.us/d1/00/header-back-small.jpg") repeat-x; height:53px; }
+/* Main Menu, Search and Breadcrumbs */
+#bar									{color:#8fbde7;		background:#ffffff;			padding:6px 8px 7px 0; overflow:hidden; }
+#bar a									{color:#072b4b;									font-weight: bold; }
+#links									{color:#3e719e;									padding:0px 8px 0 8px; }
+#links a								{color:#3e719e;									font-weight: normal; text-decoration:underline; }
+#main									{												padding-top:3px; height:24px; }
+#hello									{color:#dceaf6;									padding: 2px 4px 4px 4px; text-align:right; vertical-align:bottom; }
+#hello a								{color:#dceaf6;									text-decoration:underline; }
+#search									{												float:right; padding-left:4px; }
+#search ul								{												padding-top:2px; text-align:left; list-style-type:none; list-style-image:none; }
+#search li								{												padding-top:2px; }
+#search img								{												position:relative; top:2px; }
+#search a img							{												position:relative; top:4px; }
+/* iSearch */
+.id										{color:#142a3b;									margin:0 2px 0 2px; }	/* odd row div						*/
+.ie										{color:#142a3b;		background:#f0f8ff;			margin:0 2px 0 2px; }	/* even row div						*/
+.if										{color:#142a3b;									}						/* <a> text							*/
+.ig										{color:#de4141;									}						/* category				red			*/
+.ih										{color:#87bde7;									}						/* counter				light green	*/
+.ii										{color:#de7676;									}						/* msg at the bottom	light green	*/
+/* Image Popup */
+.img_space								{												margin:8px 10px 8px 10px; }
+.img_float								{												float:left; padding:8px 12px 8px 12px; }
+.img_float2								{												float:left; padding:0 11px 2px 11px; }
+.img_text								{												text-align:center; font-size:9px; }
+.img_bar td								{white-space:nowrap; padding:2px 4px 2px 4px; background:transparent url('http://dv1.us/d1/00/header-back-small.jpg') repeat-x; color:#ffffff; }
+.img_bar td a							{color:#fff7ac;									text-decoration:underline; }
+/* Search Helper */
+.rp										{ border-left:1px solid;margin:2px;font-size:1px;line-height:1px;border:none;background:url("http://dv1.us/di/00/sep-bg.gif") no-repeat 50% 50%; } /* long sep calendar */
+/* Main body containers */
+#body									{												clear:both; }
+#content-left							{												vertical-align:top; }
+#content-right							{												vertical-align:top; width:170px; }
+#content								{												padding:20px 16px 0 12px; }
+#content-noadv							{												padding:20px 16px 0 16px; }
+#advert									{												padding: 0    4px 0  4px; text-align:center; }
+/*
+#contentwrap							{												float:left; position:relative;  width:100%; }
+#content								{												            margin-right:178px;              padding:20px 20px 0  8px; }
+#content-noadv							{												                                             padding:20px 20px 0 20px; }
+#advert									{					background:#ffffff;			float:left; margin-left:-178px; width:170px; padding: 0    4px 0 4px; text-align:center; }
+*/
+/* Message containers */
+#msg-only								{												font-weight:normal; padding:30px 30px 30px 50px; width:480px; line-height:1.5em; }
+#msg-only p								{												margin:15px 0 15px; }
+#msg-only a								{color:#ef6262;									text-decoration:underline; }
+#msg-what								{color:#072b4b;									font-weight:bold; }
+#msg-err								{color:#bd0b0b;									font-weight:normal; }
+#msg-err p								{color:#765252;									margin:12px 0 12px 0; }
+#msg-err a								{color:#ef6262;									text-decoration:underline; }
+#msg-affect								{color:#3e719e;									font-weight:normal; }
+div.msgbox-a							{					background:#ffe7e7;			text-align:center; width:400px; margin:10px auto 20px auto; }
+div.msgbox-b							{			  border:1px solid #efa5a5;			padding:1px; }
+div.msgbox-c							{			  border:1px solid #efa5a5;			padding:2px; }
+div.msgbox-d							{					background:#ffffff;			margin:2px; padding:10px; }
+div.msgbox								{												text-align:left; }
+div.msgbox p							{												margin: 10px 0 10px 0; }
+.explain								{												}
+/* Dialog containers */
+table.dlg_table							{					background:#ffffff;			margin:10px auto 0 auto; }
+td.dlg_tit								{color:#3e719e;									padding:12px 2px 12px 2px; font-size:12px; font-weight:bold; }
+td.dlg_sec								{color:#3e719e;									padding:8px 2px 6px 2px; font-weight:bold; }
+td.dlg_info								{color:#3e719e;									font-weight:bold; padding:8px 8px 8px 2px; }
+td.dlg_left								{color:#3e719e;									font-weight:bold; padding:8px 8px 8px 2px; }
+td.dlg_right							{												padding:6px 2px 6px 8px; }
+td.dlg_left p, td.dlg_info p			{color:#072b4b;									font-weight:normal; margin:8px 0 8px 0; }
+td.dlg_left a, td.dlg_right a, td.dlg_info a					{color:#8fbde7;			text-decoration:underline; }
+td.dlg_left a:hover, td.dlg_right a:hover, td.dlg_info a:hover	{color:#b9d1e7;			}
+td.dlg_info ul							{color:#072b4b;									font-weight:normal; margin:8px 0 8px 32px; }
+td.dlg_right ul							{												margin-left:24px; }
+td.dlg_right li							{												margin-top:4px; margin-bottom:4px; }
+td.dlg_resp								{												padding:12px 2px 12px 2px; text-align:center; }
+div.dlg_error							{color:#ef6262;									margin-bottom:4px; }
+/* Section containers:
+	h1 centered heading + sections with p as a sub element
+	h2 left-justified heading + sections with p as a sub element (also used in explain popups)
+	h3 left-justified 2nd level heading, no p sections defined (also used in explain popups)
+ */
+h1										{color:#072b4b;									font-size:12px; text-align:center; font-weight:bold; margin:24px 0 20px 0; }
+h1 p									{												font-size:11px; font-weight:normal; margin:12px 0 12px 0; }
+h2										{color:#072b4b;									font-size:12px; font-weight:bold; margin:12px 0 20px 0; }
+h2 p									{color:#505a63;									font-size:11px; text-align:justify; font-weight:normal; margin:12px 0 12px 0; }
+h2 ol, h2 ul							{color:#505a63;									font-size:11px; text-align:justify; font-weight:normal; margin:12px 0 12px 30px; }
+h2 li									{												margin-bottom:12px; }
+h3										{color:#3e719e;									font-size:11px; font-weight:bold; margin:16px 0 10px 0; }
+
+h6										{												margin:10px 0 10px 0; }
+h6 p									{												padding-left:20px; margin:10px 0 10px 0; }
+.lowkey									{color:#a5acb3;									}
+.highkey								{color:#ef6262;									}
+table.border							{border:solid 1px #b9d1e7;						margin-top:3px; }
+table.border td							{border:solid 1px #b9d1e7;						padding:1px 2px 1px 2px; vertical-align:middle; }
+table.border thead						{color:#2c75b7;		background:#eaeaea;			}
+table.border thead a					{												text-decoration:underline; }
+table.no_border							{												border:none; }
+table.no_border td						{												border:none; padding:1px 2px 1px 2px; vertical-align:middle; }
+
+/* AddThis, Advertisers and Sponsors */
+.sponsor-a								{color:#072b4b;									font-size:9px; text-align:center; width:170px; margin-top:30px; }
+.sponsor-b								{												margin:2px 0 0 0; }
+.sponsor-c								{			  border:1px solid #b9d1e7;			padding:1px; }
+.sponsor-d								{			  border:1px solid #b9d1e7;			padding:2px; }
+.sponsor-d a							{												white-space:nowrap; text-decoration:underline; }
+.sponsor-h								{	   border-bottom:1px solid #b9d1e7;			margin:2px 0 1px 0; font-size:1px; line-height:1px; }
+.adsky-a								{color:#072b4b;									font-size:9px; text-align:center; width:170px; margin-top:30px; }
+.adsky-b								{												margin:2px 0 0 0; }
+.adsky-c								{			  border:1px solid #b9d1e7;			padding:1px; }
+.adsky-d								{			  border:1px solid #b9d1e7;			padding:2px; }
+.adsky-d a								{color:#3e719e;									}
+.adsky-e								{color:#3e719e;									margin-top:3px; }
+.adsky-e a								{color:#ef6262;									text-decoration:underline; }
+
+/* Colection Nav */
+#colnav									{color:#072b4b;									font-weight:bold; }
+#colnav p								{color:#de4141;									font-weight: normal; margin:2px 0 0 0; padding:0; }
+#colnav p a								{color:#de4141;									text-decoration:underline; }
+#colnav p a:hover						{color:#efa5a5;									}
+#colnav p img							{												position:relative; top:1px; }
+#colnav ul								{color:#efa5a5;									font-weight: normal; list-style-type:none; list-style-image:none; margin:4px 0 4px 60px; }
+#colnav li								{												display:inline; }
+#colnav li span							{color:#b9d1e7;									}
+#colnav li a							{												text-decoration:underline; }
+#colnav li span a						{color:#efa5a5;									text-decoration:underline; }
+#colnav li span a:hover					{color:#ef6262;									text-decoration:underline; }
+
+/* Page Nav */
+table.nav-table							{color:#072b4b;		background:#ffffff;			margin-top:10px; margin-bottom:4px; width:100%; }
+table.nav-table td						{												white-space:nowrap; vertical-align:top; }
+table.nav-table a						{color:#de4141;									text-decoration:underline; }
+table.nav-table a:hover					{color:#efa5a5;									}
+table.nav-table img						{												position:relative; bottom:1px; padding:0 4px 0 4px; }
+table.nav-table select					{												margin:0 0 0 8px; }
+#showing								{												float:left; }
+#showingxp								{												float:left; padding:0 4px 0 4px; }
+#cartxp									{												float:right; padding:0 4px 0 4px; }
+#cart									{												float:right; text-align:right; }
+/* DVD Cols - Multi */
+table.dvd_table							{border:solid 1px #b9d1e7;						clear:both; margin-top:3px; }
+table.dvd_table td						{border:solid 1px #b9d1e7;						padding:1px 2px 1px 2px; }
+table.dvd_table thead					{color:#2c75b7;		background:#eaeaea;			}
+table.dvd_table thead a					{												text-decoration:underline; }
+table.dvd_table tfoot					{color:#2c75b7;		background:#eaeaea;			}
+#exp_table								{												border:none; }
+#exp_table td							{												border:none; }
+#exp_cb									{												width:1%; text-align:right; padding:0; }
+#exp_txt								{												width:1%; text-align:right; white-space:nowrap; }
+tr.dvd_row0								{					background:#ffffff;			}
+tr.dvd_row1								{					background:#edf4fa;			}
+td.dvd_chk								{												text-align:center; }				/* check box		*/
+td.dvd_pic								{												text-align:center; font-size:9px; }	/* picture			*/
+td.dvd_tit								{												}									/* dvd title		*/
+div.dvd_bpic							{												}									/* bad picture		*/
+a.dvd_more								{color:#8fbde7;									}									/* more				*/
+div.dvd_cmts							{color:#57af63;									}									/* comments			*/
+div.dvd_gen								{												text-align:right; }					/* genre			*/
+td.dvd_imdb								{												font-size:9px; }					/* imdb link col	*/
+a.dvd_imdb								{color:#57af63;									}									/* imdb link		*/
+a.dvd_amz								{color:#57af63;									}									/* amz link			*/
+a.dvd_prc								{color:#57af63;									}									/* best price link	*/
+td.dvd_dir								{												}									/* director			*/
+td.dvd_pub								{color:#57af63;									}									/* publisher		*/
+div.dvd_ctry							{color:#ef6262;									}									/* country			*/
+div.dvd_rdt								{color:#ef6262;									}									/* release date		*/
+div.dvd_fdt								{color:#bd0b0b;									}									/* fut release date	*/
+div.dvd_rst								{color:#a69500;									}									/* release status	*/
+div.dvd_film							{color:#57af63;									}									/* release status	*/
+div.dvd_ctm								{color:#ef6262;									}									/* dvd create time	*/
+.dvd_new								{color:#de4141;									}									/* new dvd rel date	*/
+.dvd_ebay								{color:#de4141;									}									/* ebay link		*/
+div.in_owned							{color:#2c75b7;									}
+div.in_order							{color:#2c75b7;									}
+div.in_wish								{color:#2c75b7;									}
+div.in_work								{color:#2c75b7;									}
+div.in_seen								{color:#2c75b7;									}
+/* DVD Cols - One */
+table.one_table							{					background:#ffffff;			width:100%; margin:20px 0 20px 0; }
+table.one_table td						{												vertical-align:top; padding:1px 2px 1px 2px; }
+td.one_pic								{												width:30%; text-align:center; }
+td.one_pic div							{												padding:0 20px 0 0; }
+td.one_tit								{												width:70%; }
+table.one_top							{border:solid 1px #b9d1e7;						width:100%; margin-top:10px; }
+table.one_top td						{												vertical-align:top; }
+div.one_lbl, span.one_lbl				{color:#57af63;									}
+td.one_lbl								{color:#57af63;									text-align:right; white-space:nowrap; }
+#one_support							{												margin:10px 0 10px 0; }
+#one_support p							{												padding-top:4px; }
+#one_support img						{												float:left; padding-right:8px; }
+#one_improve							{												text-align:center; margin-top:4px; }
+/* DVD Cols - Edit */
+input.but_ctx							{												/*width:30px;*/ }
+input.but_def							{color:#777777;									/*width:30px;*/ }
+input.but_tst							{color:#bd0b0b;									/*width:30px;*/ }
+a.but									{color:#ef6262;									text-decoration:underline; white-space:nowrap; }
+/* DVD Cols - Prn */
+table.prn_table							{border:solid 1px #b9d1e7;						clear:both; margin-top:3px; }
+table.prn_table td						{border:solid 1px #b9d1e7;						padding:1px 2px 1px 2px; }
+table.prn_table thead					{color:#2c75b7;		background:#eaeaea;			}
+table.prn_table thead td				{												padding:4px 2px 4px 2px; }
+td.prn_chk								{												text-align:center; }
+td.prn_rno								{												text-align:center; }
+td.prn_tit								{}
+td.prn_dir								{}
+td.prn_pub								{}
+div.prn_ctry							{}
+div.prn_rst								{}
+div.in_prn								{												font-weight:bold; }
+/* Who's got it */
+table.who_table							{					background:#ffffff;			margin:20px 0 20px 0; }
+table.who_table td						{												padding:1px 4px 1px 4px; }
+td.who_count							{color:#96a0a9;									text-align:right; }
+td.who_dvd								{color:#96a0a9;									}
+/* Price Comparison */
+table.pr1_table							{												margin:16px 12px 0 12px; }
+table.pr1_table td						{												padding:1px 2px 1px 2px; vertical-align:top; }
+table.pr2_table							{border:solid 1px #b9d1e7;						margin:10px 0 10px 0; }
+table.pr2_table thead td				{color:#2c75b7;		background:#eaeaea;			padding:1px 2px 1px 2px; text-align:center; vertical-align:middle; }
+table.pr2_table tbody td				{												padding:1px 2px 1px 2px; text-align:right; vertical-align:middle; }
+.pr1_lowest								{					background:#fff7ac;			}
+table.prm_parm							{												margin-top:30px; }
+table.prm_parm td						{												vertical-align:top; }
+td.pri_ndf								{					background:#fcd9d9;			}
+td.pri_def								{					background:#fff9cc;			}
+div.pri_dif								{color:#cbd0d4;									}
+td.pri_nam								{					background:#f0f8ff;			}
+td.pri_low								{												}
+/* Popup Menus */
+.pop_sep_long							{												border-left:1px solid; margin:2px; height:1px; font-size:1px; line-height:1px; border:none; background:url("http://dv1.us/d1/00/sep-bg.gif") no-repeat 50% 50%; }
+.pop_sep_short							{												border-left:1px solid; margin:2px; height:1px; font-size:1px; line-height:1px; border:none; background:url("http://dv1.us/d1/00/sep-sm.gif") no-repeat 50% 50%; }
+.pop_div								{												margin-top:2px; margin-bottom:4px; width:200px; }
+/* Footer */
+.ruler									{	   border-bottom:1px solid #b9d1e7;			margin:1px 0 2px 0; font-size:1px; line-height:1px; }
+.synch									{												clear:both; font-size:1px; line-height:1px; }
+#footer									{color:#bbbbbb;									clear:both; padding:4px 2px 0 2px; }
+#footer-copy							{												float:left; white-space:nowrap; }
+#footer-cont							{												float:right; white-space:nowrap; text-align:right; }
+/* Explain Popups */
+div.explain								{												font-size:11px; text-align:left; }
+div.explain h1							{color:#3e719e;									margin:10px 0 6px 0; font-size:11px; text-align:left; font-weight:bold; }
+div.explain h2							{color:#3e719e;									margin:10px 0 6px 0; font-size:11px; text-align:left; font-weight:normal; }
+div.explain p							{												margin:6px 0 2px 12px; text-align:justify; }
+div.explain strong						{color:#ef6262;									font-weight:normal; }
+div.explain ul, div.explain ol			{												margin-left:30px; }
+div.explain li							{												margin:4px 0 2px 0; text-align:left; }
+div.exp-nav								{												float:right; margin:0 2px 0 6px; }
+div.explain a, div.explain a:visited, div.explain a:hover, div.explain a:active {		text-decoration:underline; }
+div.explain table						{border-style:solid; border-color:#888888;		border-width:1px; margin:12px 0 6px 0; }
+div.explain table thead					{					background:#dae9f5;			}
+div.explain table td					{border-style:solid; border-color:#888888;		border-width:1px; padding:1px 4px 1px 4px; text-align:center; }
+div.explain table th					{border-style:solid; border-color:#888888; background:#dae9f5; border-width:1px; padding:1px 4px 1px 4px; text-align:left; font-weight:normal; white-space:nowrap; }
+
+/* ==================================================================== */
+/* Selectors															*/
+/* ==================================================================== */
+.td_opt		{padding:2px 5px 2px 5px; border: 1px solid #ffffff; cursor:pointer; white-space:nowrap; color:#072b4b}
+.td_hov		{padding:2px 5px 2px 5px; border: 1px solid #b9d1e7; cursor:pointer; white-space:nowrap; color:#072b4b}
+.td_sel		{padding:2px 5px 2px 5px; border: 1px solid #072b4b; cursor:pointer; white-space:nowrap; color:#ffffff; background:transparent url('http://dv1.us/d1/00/header-back-small.jpg') repeat-x}
+
+/* ==================================================================== */
+/* TAB																	*/
+/* ==================================================================== */
+
+.cab-t		{ background: url("http://dv1.us/di/00/tm.gif") 0 0 repeat-x #ffffff	; position:relative; top:-1px; }
+.cab-b		{ background: url("http://dv1.us/di/00/tm.gif") 0 100% repeat-x		; position:relative; top:+1px; }
+.cab-r		{ background: url("http://dv1.us/di/00/tm.gif") 100% 0 repeat-y		; }
+.cab-l		{ background: url("http://dv1.us/di/00/tm.gif") 0 0 repeat-y		; padding: 3px 0 5px 4px; }
+
+.tab-00		{ background: url("http://dv1.us/di/00/td00.gif") top left no-repeat	; margin-right:4px; } 
+.tab-01		{ background: url("http://dv1.us/di/00/td01.gif") top right no-repeat	; position:relative; left:3px; }
+.tab-10		{ background: url("http://dv1.us/di/00/td10.gif") bottom left no-repeat	; position:relative; left:-3px; }
+.tab-11		{ background: url("http://dv1.us/di/00/td11.gif") bottom right no-repeat; position:relative; left:3px; }
+.tab-xx		{ padding: 3px 1px 1px 1px; text-align:center; position:relative; left:-3px; }
+
+.hab-00		{ background: url("http://dv1.us/di/00/th00.gif") top left no-repeat	; margin-right:4px; } 
+.hab-01		{ background: url("http://dv1.us/di/00/th01.gif") top right no-repeat	; position:relative; left:3px; }
+.hab-10		{ background: url("http://dv1.us/di/00/th10.gif") bottom left no-repeat	; position:relative; left:-3px; }
+.hab-11		{ background: url("http://dv1.us/di/00/th11.gif") bottom right no-repeat; position:relative; left:3px; }
+.hab-xx		{ padding: 3px 1px 1px 1px; text-align:center; position:relative; left:-3px; }
+
+.sab-00		{ background: url("http://dv1.us/di/00/ts00.gif") top left no-repeat	; margin-right:4px; position:relative; } 
+.sab-01		{ background: url("http://dv1.us/di/00/ts01.gif") top right no-repeat	; position:relative; left:3px; }
+.sab-10		{ background: url("http://dv1.us/di/00/ts10.gif") bottom left no-repeat	; position:relative; left:-3px; }
+.sab-11		{ background: url("http://dv1.us/di/00/ts11.gif") bottom right no-repeat; position:relative; left:3px; }
+.sab-xx		{ padding: 3px 1px 1px 1px; text-align:center; position:relative; left:-3px; }
+
+/* ==================================================================== */
+

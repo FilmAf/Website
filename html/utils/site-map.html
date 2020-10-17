@@ -1,0 +1,186 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndMenu.php';
+
+class CSiteMap extends CWndMenu
+{
+	function constructor() // <<--------------------<< 1.0
+	{
+		CWndMenu::constructor();
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+
+		$this->ms_include_css	   .=
+		"<style type='text/css'>".
+			".dh1 { color:#072b4b; font-size:12px; text-align:center; font-weight:bold; margin:24px 0 20px 0; }".
+			".dh1 p { font-size:11px; font-weight:normal; margin:12px 0 12px 0; }".
+			".dh1 { font-size:12px; font-weight:normal; color:#005e0d; margin:12px 0 0 20px; text-align:left; }".
+			".dh2 {color:#072b4b; font-size:12px; font-weight:bold; margin:12px 0 20px 0; }".
+			".dh2 p {color:#505a63; font-size:11px; text-align:justify; font-weight:normal; margin:12px 0 12px 0; }".
+			".dh2 ol, .dh2 ul {color:#505a63; font-size:11px; text-align:justify; font-weight:normal; margin:12px 0 12px 30px; }".
+			".dh2 li { margin-bottom:12px; }".
+			".dh2 a:link, .dh2 a:visited, .dh2 a:active { font-size:11px; font-weight:normal; margin:4px 0 0 32px; }".
+			".dh2 p { margin:4px 0 4px 32px; }".
+			".col { padding:8px 14px 0 4px }".
+		"</style>";
+	}
+
+	function initSiteMap()
+	{
+		$this->ma_mkt_left		= array();
+		$this->ma_mkt_left[]	= array('tit' => "Shopping cart / Price comparison",
+										'url' => "{$this->ms_base_subdomain}/price.html",
+										'txt' => "FilmAf price comparison engine with the titles you have previously added to your cart.");
+
+		$this->ma_mkt_right		= array();
+		$this->ma_mkt_right[]	= array('tit' => "Blu-ray releases",
+										'url' => "{$this->ms_base_subdomain}/releases.html?med=B&amp;init_form=med_0_B",
+										'txt' => "FilmAf list of upcoming and recently released Blu-ray titles.");
+		$this->ma_mkt_right[]	= array('tit' => "DVD releases",
+										'url' => "{$this->ms_base_subdomain}/releases.html?med=D&amp;init_form=med_0_D",
+										'txt' => "FilmAf list of upcoming and recently released DVD titles.");
+
+		// ---------------------------------------------
+
+		$this->ma_col_left		= array();
+		$this->ma_col_left[]	= array('tit' => "Folder maintenance",
+										'url' => "{$this->ms_base_subdomain}/utils/folders.html",
+										'txt' => "Create, edit and delete folders for better collection management.");
+
+		$this->ma_col_right		= array();
+		$this->ma_col_right[]	= array('tit' => "Export your collection",
+										'url' => $this->ms_user_id != '' && $this->mb_logged_in
+											 ? "http://{$this->ms_user_id}{$this->ms_unatrib_subdomain}/export.html"
+											 : "javascript: void(alert(\"Please login before exporting your collection.\"))",
+										'txt' => "Export your FilmAf collection to a tab-separated text file.");
+
+		// ---------------------------------------------
+
+		$this->ma_dvd_left		= array();
+		$this->ma_dvd_left[]	= array('tit' => "Help FilmAf survive!",
+										'url' => "{$this->ms_base_subdomain}/utils/help-filmaf.html",
+										'txt' => "Donate and Become a Star Member.");
+
+		$this->ma_dvd_right		= array();
+		$this->ma_dvd_right[]	= array('tit' => "Submission history",
+										'url' => "{$this->ms_base_subdomain}/utils/x-dvd-edit.html",
+										'txt' => "Your FilmAf change request history.");
+		$this->ma_dvd_right[]	= array('tit' => "Submit new title",
+										'url' => "{$this->ms_base_subdomain}/utils/x-dvd-edit.html?dvd=new",
+										'txt' => "Add new DVD titles to the FilmAf database.");
+
+		// ---------------------------------------------
+
+		// ---------------------------------------------
+
+		$this->ma_pas_left		= array();
+		$this->ma_pas_left[]	= array('tit' => "Update your email address",
+										'url' => "{$this->ms_base_subdomain}/utils/email.html",
+										'txt' => "You will need a current email address if you ever forget your password or you ".
+												 "may not be able to regain access to your account.");
+
+		$this->ma_pas_right		= array();
+		$this->ma_pas_right[]	= array('tit' => "Change your password",
+										'url' => "{$this->ms_base_subdomain}/utils/password.html",
+										'txt' => "Pick a new password.");
+		$this->ma_pas_right[]	= array('tit' => "Reset password",
+										'url' => "{$this->ms_base_subdomain}/utils/reset-password.html",
+										'txt' => "Generate a new password and have it sent to your email address.");
+
+		// ---------------------------------------------
+
+		$this->ma_mnt_left		= array();
+		$this->ma_mnt_left[]	= array('tit' => "Registration",
+										'url' => "{$this->ms_base_subdomain}/utils/register.html",
+										'txt' => "Create a free new account with FilmAf.");
+		$this->ma_mnt_left[]	= array('tit' => "Validate email",
+										'url' => "{$this->ms_base_subdomain}/utils/validate-email.html",
+										'txt' => "Resend you a new validation email or validate your email address with the code ".
+												 "you received in your email. You must do this before you can have full access to ".
+												 "FilmAf.");
+		$this->ma_mnt_left[]	= array('tit' => "Find account",
+										'url' => "{$this->ms_base_subdomain}/utils/find-account.html",
+										'txt' => "Find your FilmAf based on your email address.");
+//		$this->ma_mnt_left[]	= array('tit' => "Find account based old FilmAf 1.0 user name",
+//										'url' => "{$this->ms_base_subdomain}/utils/find-new-account.html",
+//										'txt' => "Find your FilmAf based on your email address.");
+		$this->ma_mnt_left[]	= array('tit' => "Delete account",
+										'url' => "{$this->ms_base_subdomain}/utils/del-account.html",
+										'txt' => "Delete your online DVD collection and your FilmAf account.");
+
+		$this->ma_mnt_right		= array();
+		$this->ma_mnt_right[]	= array('tit' => "Log in",
+										'url' => "{$this->ms_base_subdomain}/utils/login.html",
+										'txt' => "Log in to FilmAf and maintain your DVD collection.");
+		$this->ma_mnt_right[]	= array('tit' => "Log out",
+										'url' => "{$this->ms_base_subdomain}/utils/logout.html",
+										'txt' => "Log out from FilmAf so that people using this computer do not impersonate you.");
+
+		// ---------------------------------------------
+	}
+
+	function drawBodyPage() // <<-------------------------------<< 7.2
+	{
+		$this->initSiteMap();
+
+		$this->drawSection('Market Center'						, $this->ma_mkt_left, $this->ma_mkt_right);
+		$this->drawSection('Your Collection'					, $this->ma_col_left, $this->ma_col_right);
+		$this->drawSection('Your Contribution'					, $this->ma_dvd_left, $this->ma_dvd_right);
+		$this->drawSection('Account Maintenance'				, $this->ma_mnt_left, $this->ma_mnt_right);
+		$this->drawSection('Email and Password'					, $this->ma_pas_left, $this->ma_pas_right);
+	}
+
+	function drawSection($s_section, &$a_left, &$a_right)
+	{
+		$s_spacer = "<img src='http://dv1.us/d1/1.gif' height='1px' width='300px' />";
+
+		echo	"<div class='dh1'>{$s_section}</div>".
+				"<table width='100%'>".
+				  "<tr>".
+					"<td valign='top' width='50%'>";
+
+		for ( $i = 0 ; $i < count($a_left) ; $i++ )
+		{
+			if ( $i == 0 ) echo "<table width='100%'>";
+			echo  "<tr><td class='col'>".
+					($i == 0 ? $s_spacer : '').
+					"<div class='dh2'>".
+					  "<a href='{$a_left[$i]['url']}'>{$a_left[$i]['tit']}</a>".
+					  "<p>{$a_left[$i]['txt']}</p>".
+					"</div>". 
+				  "</td></tr>";
+		}
+
+		echo	      "</table>".
+					"</td>".
+					"<td valign='top' width='50%'>";
+
+		for ( $i = 0 ; $i < count($a_right) ; $i++ )
+		{
+			if ( $i == 0 ) echo "<table width='100%'>";
+			echo		  "<tr><td class='col'>".
+							($i == 0 ? $s_spacer : '').
+							"<div class='dh2'>".
+							  "<a href='{$a_right[$i]['url']}'>{$a_right[$i]['tit']}</a>".
+							  "<p>{$a_right[$i]['txt']}</p>".
+							"</div>". 
+						  "</td></tr>";
+		}
+
+		echo	      "</table>".
+					"</td>".
+				  "</tr>".
+				"</table>";
+	}
+}
+
+new CSiteMap;
+
+?>

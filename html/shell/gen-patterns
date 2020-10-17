@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#generate picture construct patterns
+
+file="/var/www/html/icons/copy.miff"
+if [ ! -f "$file" ]; then
+    convert -size 298x50 xc:none -gravity center \
+    -stroke "#777777" -strokewidth 3           -draw "text 0,0 '© respective copyright owners.'" \
+    -gaussian 0x2 -stroke none -fill "#eeeeee" -draw "text 0,0 '© respective copyright owners.'" \
+    miff:$file
+    chmod 644 $file 2> /dev/null
+fi
+
+file="/var/www/html/icons/filmaf.miff"
+if [ ! -f "$file" ]; then
+    convert -size 250x60 xc:none -gravity center \
+    -stroke "#777777" -strokewidth 3 -pointsize 48 -draw "text 0,0 'filmaf.com'" \
+    -gaussian 0x2 -stroke none -fill "#eeeeee" -draw "text 0,0 'filmaf.com'" \
+    miff:$file
+    chmod 644 $file 2> /dev/null
+fi
+
+file="/var/www/html/icons/checker-v.gif"
+if [ ! -f "$file" ]; then
+    convert -size 15x2000 pattern:checkerboard -normalize -fill "#ffff33" -opaque black -fill "#ff99ff" -opaque white $file
+    chmod 644 $file 2> /dev/null
+fi
+
+file="/var/www/html/icons/checker-h.gif"
+if [ ! -f "$file" ]; then
+    convert -size 2000x15 pattern:checkerboard -normalize -fill "#ffff33" -opaque black -fill "#ff99ff" -opaque white $file
+    chmod 644 $file 2> /dev/null
+fi
+

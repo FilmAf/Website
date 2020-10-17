@@ -1,0 +1,20 @@
+#!/bin/bash
+
+chmod 600 *.css
+
+##########################################################
+#echo "filmaf.css"
+cat \
+cin-filmaf.css \
+cin-calendar.css \
+cin-hmenu.css \
+> a.css
+/home/dvdaf/scripts/cruch.css.pl a.css >filmaf.css 2>/dev/null
+#cp a.css filmaf.css
+rm -f a.css
+chmod 644 filmaf.css
+
+##########################################################
+
+exit 0
+

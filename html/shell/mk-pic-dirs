@@ -1,0 +1,28 @@
+#!/bin/bash
+
+base="/var/www/html/p"
+
+for k in `seq -f%01g 0 6`; do
+    mkdir "$base$k"
+    chmod 755 "$base$k"
+    cd "$base$k"
+
+    for i in `seq -f%03g 0 999`; do
+	mkdir $i
+    done
+    chmod 777 *
+done
+
+base="/var/www/html/o"
+
+for k in `seq -f%01g 0 6`; do
+    mkdir "$base$k"
+    chmod 755 "$base$k"
+    cd "$base$k"
+
+    for i in `seq -f%03g 0 999`; do
+	mkdir $i
+    done
+    chmod 777 *
+done
+

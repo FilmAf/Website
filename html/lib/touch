@@ -1,0 +1,12 @@
+#!/bin/bash
+
+touch /var/www/html/lib/controls/*
+touch /var/www/html/lib/*
+touch /var/www/html/libx/*
+touch /var/www/html/icons/*
+touch /var/www/html/styles/00/*
+touch /var/www/html/styles/*
+touch /var/www/html/utils/*
+touch /var/www/html/shell/*
+touch /var/www/html/*
+

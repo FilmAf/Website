@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#p0/###    small                *.gif +++ already populated
+#p1/###    medium               *.jpg --- to be populated
+#p2/###    large                *.jpg -
+#p3/###    huge                 *.jpg -
+#p4/###    original display     *.jpg --- to be populated
+#p5/###    edited               *.pgn
+#p6/###    original             *.jpg +++
+#uploads   unprocessed pics     *.jpg, *.gif, *.bmp, *.png
+
+function echo_usage {
+    echo ""
+    echo "This script will move '/var/www/html/uploads/[source] to '/var/www/html/p6/___/[target].jpg'. If the source is not a jpg it will be converted."
+    echo ""
+    if [ "$1" != '' ]; then
+	echo "ERROR:"
+	echo "    $1"
+	echo ""
+    fi
+    echo "Usage:"
+    echo "    $0 [source] [target]"
+    echo ""
+    echo "Source:"
+    echo "    File name and extension for '/var/www/html/uploads/[source]', no path"
+    echo ""
+    echo "Target:"
+    echo "    File name without an extension for '/var/www/html/p6/___/[target].jpg', no path"
+    echo ""
+    exit
+}
+
+if [ $# != 2 ]; then
+    echo_usage
+fi
+
+#get source "upload-file-name.ext"
+ext=$[${#1}-3]
+src=$[${#1}-4]
+ext="${1:$ext:3}"
+srn="/var/www/html/uploads/${1:0:$src}"
+src="$srn.$ext"
+if [ ! -f "$src" ]; then
+    echo_usage "Could not find source file $src"
+fi
+shift
+
+#get target "009000-d0"
+dir="${1:3:3}"
+trg="/var/www/html/p6/$dir/$1.jpg"
+if [ ! -d "/var/www/html/p6/$dir" ]; then
+    echo_usage "Could not find target directory /var/www/html/p6/$dir"
+fi
+shift
+
+#move or convert
+if [ "$ext" = "jpg" ]; then
+    mv -f $src $trg
+else
+    rm -f $trg
+    convert $src -quality 90 $trg
+fi
+if [ -f $trg ]; then
+    chmod 666 $trg 2> /dev/null
+    rm -f $srn.*
+    rm -f $srn-*
+fi
+

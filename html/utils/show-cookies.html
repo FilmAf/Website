@@ -1,0 +1,93 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlg.php';
+
+class CShowCookies extends CWndDlg
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWndDlg::constructor();
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title			= 'Cookies';
+		$this->ms_include_js	= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+		$this->mb_popup			= dvdaf3_getvalue('pop', DVDAF3_BOOLEAN | DVDAF3_GET);
+		$this->mn_header_type	= $this->mb_popup ? CWnd_HEADER_SMALL : CWnd_HEADER_BIG;
+		$this->ms_table_id		= 'cookiedlg';
+
+		$this->ms_include_css  .=
+		"<style type='text/css'>".
+			"#cookiedlg { width:400px; }".
+		"</style>";
+
+		$this->ma_fields	= array(
+		'curr'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => '&nbsp;'),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'input' => CWnd_DLG_INPUT_BUTTONS,
+							 'opt'   => array(
+										array('type' => 'button', 'name' => 'cleanmost', 'value' => 'Clear most cookies', 'onclick' => 'if (Cookie.clean(0)) location.href=location.href'),
+										array('type' => 'button', 'name' => 'cleanall' , 'value' => 'Clear all cookies' , 'onclick' => 'if (Cookie.clean(1)) location.href=location.href'),
+										array('type' => 'button', 'name' => 'cancel'   , 'value' => 'Do nothing, take me back', 'onclick' => "history.go(-1)"))
+							 )
+		);
+	}
+
+	function validateDataSubmission() // <<---------------------<< 6.0
+	{
+		global $_COOKIE;
+
+		CWndDlg::validateDataSubmission();
+
+		$mode = dvdaf3_getvalue('mode', DVDAF3_GET|DVDAF3_LOWER);
+		$str  = '';
+
+		foreach ( $_COOKIE as $s_key => $s_value )
+		{
+			switch ( $s_key )
+			{
+			case 'sess':
+			case 'parm': $s_value = substr($s_value,32); break;
+			}
+
+			if ( $s_key != 'orig' )
+			{
+				$str .= "$s_key = <span style='color:#ff0000'>[</span>$s_value<span style='color:#ff0000'>]</span><br />";
+			}
+		}
+
+		if ( $str )
+		{
+			$str  = "These are your cookies for Film Aficionado :)".
+					"<p style='padding:10px 0px 10px 20px'>". substr($str,0,-6) ."</p>";
+		}
+		else
+		{
+			$str  = "There are no Film Aficionado cookies in your browser.";
+			$this->ma_fields['enter']['opt'] = array(array('type' => 'button', 'name' => 'ok'   , 'value' => 'Continue to homepage', 'onclick' => "location.href=\"/\""));
+		}
+
+		if ( $this->mb_popup )
+		{
+			$this->ma_fields['enter']['opt'][0]['value']   = 'Close';
+			$this->ma_fields['enter']['opt'][0]['onclick'] = 'return window.close()';
+		}
+
+		$this->ma_fields['curr']['label'] = $str;
+	}
+}
+
+new CShowCookies;
+
+?>

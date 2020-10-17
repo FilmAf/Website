@@ -1,0 +1,258 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+
+class CSecQuestions extends CWndDlgStep
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title					= 'Security Questions';
+		$this->ms_include_js			= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+		$this->mb_must_login			= true;
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= false;
+		$this->ma_steps[0]['validate']	= true;
+		$this->ma_steps[0]['redirect']	= '';
+		$this->ma_steps[1]				= array();
+		$this->ma_steps[1]['seed']		= false;
+		$this->ma_steps[1]['validate']	= false;
+		$this->ma_steps[1]['redirect']	= '';
+	}
+
+	function initStep_0()
+	{
+		$this->ma_fields = array(
+		'_title'		=> array('kind'  => CWnd_DLG_KIND_TITLE,
+								 'flags' => 0,
+								 'label' => 'Password Recovery Options'),
+
+		'_info0'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' =>
+								 "<p>".
+								   "Set these up now so that you can take advantage of them if you run ".
+								   "into trouble.".
+//								 "</p>".
+//								 "<p>".
+//								   "Sometimes people change emails and forget to update their info at Film ".
+//								   "Aficionado. If that happens and happen to you forget your password there ".
+//								   "are a few options left.".
+								 "</p>"
+								 ),
+		'step'			=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE,
+								 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+			// -------------------------------------------------------------------------------------------
+		'_sect1'		=> array('kind'  => CWnd_DLG_KIND_SECTION,
+								 'flags' => 0,
+								 'label' => "<span style='color:#de4141'>#1: Alternate email addresses</span>"),
+
+		'_info1'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' =>
+								 "<p>".
+								   "You can add up to 3 other email addresses which can be used to send ".
+								   "you a new password. We will not sell or share your info.".
+								 "</p>"
+								 ),
+		'_email1'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL,
+								 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36", 'min' => 0, 'max' => 32,
+								 'uparm' => DVDAF3_POST, 'label' => "Alternate email 1"),
+		'_email2'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL,
+								 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36", 'min' => 0, 'max' => 32,
+								 'uparm' => DVDAF3_POST, 'label' => "Alternate email 2"),
+		'_email3'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL,
+								 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36", 'min' => 0, 'max' => 32,
+								 'uparm' => DVDAF3_POST, 'label' => "Alternate email 3"),
+
+		// -------------------------------------------------------------------------------------------
+		'_sect2'		=> array('kind'  => CWnd_DLG_KIND_SECTION,
+								 'flags' => 0,
+								 'label' => "<span style='color:#de4141'>#2: Security Questions</span>"),
+		'_info2'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' =>
+								 "<p>".
+								   "These security questions would allow anyone with the right answers ".
+								   "to reset your password and gain access to your account. If you decide ".
+								   "to use them it is best to pick questions that do not have common ".
+								   "answers like cop, doctor, firefighter, home, school, work, superman, ".
+								   "dad, mom, brother, sister, etc.".	
+								 "</p>"
+								 ),
+		'q1'			=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED, 'input' => CWnd_DLG_INPUT_SELECT,
+								 'sele'  => array(
+									1 => 'What was the name of your first stuffed animal?',
+									2 => 'As a child, what did you want to be when you grew up?',
+									3 => 'What was the name of the first boy/girl you were enamorated with?',
+									4 => 'Where were you when you had your first kiss?',
+									5 => 'What was the name of the first boy/girl you kissed?',
+									6 => 'What was the last name of your first grade teacher?',
+									7 => 'Where were you when you first heard about 9/11?',
+									8 => 'Who was your childhood hero?',
+									9 => 'What is your maternal grandmother&#39;s maiden name?',
+								   10 => 'Where were you when you had your first alcoholic drink?'),
+								 'uparm' => DVDAF3_POST, 'value' => '1',
+								 'label' => "Question 1"),
+		'a1'			=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST,
+								 'label' => ""),
+
+		'q2'			=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED, 'input' => CWnd_DLG_INPUT_SELECT,
+								 'sele'  => array(
+									1 => 'What was the name of your first stuffed animal?',
+									2 => 'As a child, what did you want to be when you grew up?',
+									3 => 'What was the name of the first boy/girl you were enamorated with?',
+									4 => 'Where were you when you had your first kiss?',
+									5 => 'What was the name of the first boy/girl you kissed?',
+									6 => 'What was the last name of your first grade teacher?',
+									7 => 'Where were you when you first heard about 9/11?',
+									8 => 'Who was your childhood hero?',
+									9 => 'What is your maternal grandmother&#39;s maiden name?',
+								   10 => 'Where were you when you had your first alcoholic drink?'),
+								 'uparm' => DVDAF3_POST, 'value' => '2',
+								 'label' => "Question 2"),
+		'a2'			=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST,
+								 'label' => ""),
+
+		'q3'			=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED, 'input' => CWnd_DLG_INPUT_SELECT,
+								 'sele'  => array(
+									1 => 'What was the name of your first stuffed animal?',
+									2 => 'As a child, what did you want to be when you grew up?',
+									3 => 'What was the name of the first boy/girl you were enamorated with?',
+									4 => 'Where were you when you had your first kiss?',
+									5 => 'What was the name of the first boy/girl you kissed?',
+									6 => 'What was the last name of your first grade teacher?',
+									7 => 'Where were you when you first heard about 9/11?',
+									8 => 'Who was your childhood hero?',
+									9 => 'What is your maternal grandmother&#39;s maiden name?',
+								   10 => 'Where were you when you had your first alcoholic drink?'),
+								 'uparm' => DVDAF3_POST, 'value' => '3',
+								 'label' => "Question 3"),
+		'a3'			=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST,
+								 'label' => ""),
+
+		// -------------------------------------------------------------------------------------------
+		'_sect3'		=> array('kind'  => CWnd_DLG_KIND_SECTION,
+								 'flags' => 0,
+								 'label' => "<span style='color:#de4141'>#3: Text Messaging</span>"),
+
+		'_info3'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' =>
+								 "<p>".
+								   "As a last resort, and at your request, we can attempt to send you a text message ".
+								   "via Google SMS (<a href='http://www.google.com/mobile/sms/mail/' target='blank'>".
+								   "http://www.google.com/mobile/sms/mail/</a>) -- not available in all countries. ".
+								   "It may take a day or two as we have to do it manually and we do not really have ".
+								   "a staff. We will not sell or share your info. Depending on what kind of plan ".
+								   "you have your carrier may charge you a fee for receiving a text message. We ".
+								   "have no control over that.".
+								 "</p>"
+								 ),
+		'mobile'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL,
+								 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='18'", 'min' => 0, 'max' => 16,
+								 'uparm' => DVDAF3_POST, 'label' => "Mobile Number"),
+		'country'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL,
+								 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='18'", 'min' => 0, 'max' => 16,
+								 'uparm' => DVDAF3_POST, 'label' => "Country"),
+
+
+
+
+/*
+		'code_int'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='12'", 'min' => 0, 'max' =>  8, 'uparm' => DVDAF3_POST,
+								 'label' => "Security Code Confirmation".
+											"<p>Please enter the 6 characters shown in the image.<br /><img src='{$this->ms_base_subdomain}/icons/security-code.jpg?id=______' alt='Security code' /></p>"),
+
+		'code_ext'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '0'),
+*/
+		'enter'			=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+								 'flags' => 0,
+								 'label' => '',
+								 'opt'   => array(
+											array('type' => 'button', 'name' => 'cancel', 'value' => 'Cancel', 'onclick' => "location.href=\"/\""),
+											array('type' => 'submit', 'name' => 'ok'    , 'value' => 'Save'  , 'onclick' => '')),
+								 'input' => CWnd_DLG_INPUT_BUTTONS));
+
+		$this->ms_onsubmit = 'ChangePass.validate()';
+	}
+
+	function validateStep_0()
+	{
+		CWndDlg::validateDataSubmission();
+		if ( $this->mn_action == CWnd_INPUT_GOOD )
+		{
+			$s_name		 = $this->ms_user_id;
+			$s_pass_cur	 =        $this->ma_fields['pass_curr']['value'];
+			$s_pass_new	 =        $this->ma_fields['pass_new1']['value'];
+			$s_code_int	 =		  $this->ma_fields['code_int']['value'];
+			$n_code_ext	 = intval($this->ma_fields['code_ext']['value']);
+			$s_hash		 = CSql::query_and_fetch1("SELECT password_hash FROM dvdaf_user WHERE user_id = '$s_name'", 0,__FILE__,__LINE__);
+			$b_error_msg = false;
+
+			if ( $s_hash )
+			{
+				if ( CForm::valSecurityCode($b_error_msg, $this->ma_fields['code_int'], $n_code_ext, $s_code_int) )
+				{
+					if ( CForm::valPass($b_error_msg, $this->ma_fields['pass_curr'], $s_pass_cur, $s_hash) )
+					{
+						if ( $s_pass_new == $this->ma_fields['pass_new2']['value'] )
+						{
+							$s_hash = CHash::hash_password($s_pass_new);
+							CSql::query_and_free("UPDATE dvdaf_user SET password_hash = '{$s_hash}' WHERE user_id = '{$s_name}'", 0,__FILE__,__LINE__);
+						}
+						else
+						{
+							$this->ma_fields['pass_new2']['valid'] = false;
+							$this->ma_fields['pass_new2']['value'] = '';
+							$this->ma_fields['pass_new2']['error'] = 'The two passwords do not match.';
+							$this->ma_fields['pass_new1']['value'] = '';
+							$b_error_msg = true;
+						}
+					}
+				}
+			}
+
+			if ( $b_error_msg )
+			{
+				$this->ms_error_msg = 'Please see below for details.';
+				$this->mn_action = CWnd_INPUT_ERROR;
+			}
+		}
+	}
+
+	function initStep_1()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>Your password has been changed.</p>"),
+
+		'enter'		=> array('kind'	=> CWnd_DLG_KIND_RESPONSE,
+							 'flags'=> 0,
+							 'label'=> '',
+							 'opt'  => array(array('type' => 'button', 'name' => 'ok', 'value' => 'Continue to homepage' , 'onclick' => "location.href=\"/\"")),
+							 'input'=> CWnd_DLG_INPUT_BUTTONS));
+	}
+}
+
+new CSecQuestions;
+
+?>

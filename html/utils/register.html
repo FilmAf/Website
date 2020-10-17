@@ -1,0 +1,246 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+
+class CRegister extends CWndDlgStep
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title					= 'Signing up for Film Aficionado';
+		$this->ms_include_js			= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= false;
+		$this->ma_steps[0]['validate']	= false;
+		$this->ma_steps[0]['redirect']	= '';
+		$this->ma_steps[1]				= array();
+		$this->ma_steps[1]['seed']		= true;
+		$this->ma_steps[1]['validate']	= true;
+		$this->ma_steps[1]['redirect']	= '';
+		$this->ma_steps[2]				= array();
+		$this->ma_steps[2]['seed']		= false;
+		$this->ma_steps[2]['validate']	= false;
+		$this->ma_steps[2]['redirect']	= '';
+		$this->ma_steps[3]				= array();
+		$this->ma_steps[3]['seed']		= false;
+		$this->ma_steps[3]['validate']	= false;
+		$this->ma_steps[3]['redirect']	= $this->ms_base_subdomain;
+	}
+
+	function initStep_0()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+		'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "CONDITIONS OF USE STATEMENT".
+
+										"<p>No person under the age of 14 (13 years old ".
+										"and younger) may register and or maintain an account (membership, login, ".
+										"id, etc.) in this site. By registering or maintaining an account you are, ".
+										"under penalties of perjury, affirming that you are 14 years old or older.".
+										"</p>".
+
+										"<p>By using this site, registering or maintaining ".
+										"an account (either of the three) you are also declaring that you agree not ".
+										"to hold us responsible for damages you may suffer in connection with this ".
+										"site or the information it provides or hosts. By &quot;us&quot; we mean and ".
+										"any persons or entities associated with the creation, distribution, ".
+										"provision of services or any other activity related to this site.</p>".
+
+										"<p>You also agree to allow us to show your folders ".
+										"and corresponding titles to others. We will not sell your email address to ".
+										"other companies. However, there are no guaranties that the information will ".
+										"not become public. If that happens for any reason you agree not to hold us ".
+										"responsible or liable for any damages. We also reserve the right to ".
+										"unilaterally terminate accounts.</p>".
+
+										"<p>We forfeit any responsibility on the accuracy ".
+										"or correctness of the information in this site. Do not trust the pictures, ".
+										"descriptions and other information associated with a title as accurate or ".
+										"reflecting the item pointed by the links to retailers we provide.</p>".
+
+										"<p>This statement was last updated on October 10, 2020.</p>"),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(
+										array('type' => 'submit', 'name' => 'ok'    , 'value' => 'I agree', 'onclick' => ''),
+										array('type' => 'button', 'name' => 'cancel', 'value' => 'Cancel' , 'onclick' => "location.href=\"/\"")),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+	}
+
+	function initStep_1()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '2'),
+
+		'name'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST|DVDAF3_LOWER,
+							 'label' => "User name".
+										"<p>".
+										  "Your desired log in user name (3 characters or more). It may contain lowercase letters [a-z], ".
+										  "numbers [0-9] and the dash [-]. You will be able to access your DVD collection as ".
+										  "<p style='padding:0 0 10px 20px;white-space:nowrap'><strong>http://user-name.filmaf.com</strong></p>".
+										"</p>"),
+
+		'pass_1'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_PASS, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST,
+							 'label' => "Your password".
+										"<p>".
+										  "Your password must have at least 3 letters [A-Za-z] or numbers [0-9] with no spaces. Note ".
+										  "that passwords are case sensitive ('A' is different than 'a').".
+										"</p>"),
+				
+		'pass_2'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_PASS, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST,
+							 'label' => "Confirm password".
+										"<p>".
+										  "&nbsp;".
+										"</p>"),
+				
+		'email'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 64, 'uparm' => DVDAF3_POST,
+							 'label' => "Email address".
+										"<p>".
+										  "You may want to send an empty email to <strong>noreply@filmaf.com</strong> to ensure ".
+										  "your email program does not discard the registration confirmation as spam.".
+"<div class='msgbox-a'><div class='msgbox-b'><div class='msgbox-c'><div class='msgbox-d'><div class='msgbox'>".
+"Hi, for some reason that escapes me our emails are not being delivered to hotmail.com -- please use a different provider to sign up for FilmAf until this problem is resolved. We do not know what else to suggest. Sorry.<br />&nbsp;<br />As there is no resolution in sight, you may want to post on <a href='http://answers.microsoft.com/thread/90aaa53c-1543-4a66-9aad-d0b38fd11720' target='hotmail'>this thread</a> for hotmail support to see that there are people being affected.".
+"</div></div></div></div></div>".
+										"</p>"),
+
+		'code_int'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='12'", 'min' => 0, 'max' =>  8, 'uparm' => DVDAF3_POST,
+							 'label' => "Security Code Confirmation".
+										"<p>".
+										  "Please enter the 6 characters shown in the image.<br />".
+										  "<img src='{$this->ms_base_subdomain}/icons/security-code.jpg?id=______' alt='Security code' />".
+										"</p>"),
+
+		'code_ext'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '0'),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(array('type' => 'submit', 'name' => 'ok', 'value' => 'Register', 'onclick' => '')),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+		$this->ms_onsubmit = 'Register.validate()';
+	}
+
+	function validateStep_1()
+	{
+		CWndDlg::validateDataSubmission();
+		if ( $this->mn_action == CWnd_INPUT_GOOD )
+		{
+			$s_name         =        $this->ma_fields['name'    ]['value'];
+			$s_pass_1       =        $this->ma_fields['pass_1'  ]['value'];
+			$s_pass_2       =        $this->ma_fields['pass_2'  ]['value'];
+			$s_email        =        $this->ma_fields['email'   ]['value'];
+			$s_code_int     =		 $this->ma_fields['code_int']['value'];
+			$n_code_ext     = intval($this->ma_fields['code_ext']['value']);
+			$b_error_msg    = false;
+
+			if ( CForm::valSecurityCode($b_error_msg, $this->ma_fields['code_int'], $n_code_ext, $s_code_int) )
+			{
+				$s_lower	= strtolower($s_email);
+				if ( CSql::query_and_fetch1("SELECT 1 FROM dvdaf_user where user_id = '{$s_name}'", 0,__FILE__,__LINE__) )
+					CForm::setUserExists($b_error_msg, $this->ma_fields['name'], $s_name);
+				if ( CSql::query_and_fetch1("SELECT 1 FROM dvdaf_user_2 where LOWER(email) = '{$s_lower}' or LOWER(email_proposed) = '{$s_lower}'", 0,__FILE__,__LINE__) )
+					CForm::setUserEmailExists($b_error_msg, $this->ma_fields['email']);
+			}
+
+			CForm::valUserName($b_error_msg, $this->ma_fields['name'  ], $s_name);
+			CForm::valNewEmail($b_error_msg, $this->ma_fields['email' ], $s_email);
+			CForm::valNewPass ($b_error_msg, $this->ma_fields['pass_1'], $this->ma_fields['pass_2'], $s_pass_1, $s_pass_2);
+
+			if ( $b_error_msg )
+			{
+				$this->ms_error_msg = 'Please see below for details.';
+				$this->mn_action = CWnd_INPUT_ERROR;
+			}
+			else
+			{
+				$this->createUser($s_name, $s_email, $s_pass_1);
+			}
+		}
+	}
+
+	function createUser($s_name, $s_email, $s_pass)
+	{
+		$s_hash = CHash::hash_password($s_pass);
+		$s_auth = CSecure::randEmail();
+
+		CSql::query_and_free("INSERT INTO dvdaf_user (user_id, password_hash, dvdaf_user_created_tm) ".
+					 "VALUES ('$s_name', '$s_hash', now())",
+					 0,__FILE__,__LINE__);
+
+		CSql::query_and_free("INSERT INTO dvdaf_user_2 (user_id, email_proposed, email_validation_cd, user_expire_tm) ".
+					 "VALUES ('$s_name', '$s_email', '$s_auth', date_add(now(), INTERVAL 1 DAY))",
+					 0,__FILE__,__LINE__);
+
+		CEmail::sendValidation($s_name, $s_email, $s_auth);
+		$this->ms_new_user  = $s_name;
+		$this->ms_new_email = $s_email;
+	}
+
+	function initStep_2()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '3'),
+
+		'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>Welcome to the growing Film Aficionado community {$this->ms_new_user},</p>".
+
+										"<p>You will be getting a confirmation email at <strong>{$this->ms_new_email}</strong> ".
+										"in a few minutes.  Once you received it click on the link and your Film Aficionado membership ".
+										"will be activated.</p>".
+
+										"<p>&nbsp;</p>".
+										"<p>All the best,</p>".
+										"<p>- The Film Aficionado Team.</p>".
+										"<p>&nbsp;</p>".
+
+										"<p><strong>If you can not find your validation email</strong>: Check your inbox and ".
+										"your junk mail folders. If it is not there in some 5-10 minutes then try sending an ".
+										"empty email to <strong>noreply@filmaf.com</strong>. This will attempt to tell your email ".
+										"program not to discard your registration confirmation. Then request a new validation ".
+										"email from the <a href='/utils/login.html'>login screen</a>. Note that after a day new ".
+										"accounts that have not been validated are deleted, giving you a chance to try a ".
+										"different email address, etc.</p>"),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(
+								 		array('type' => 'button', 'name' => 'validate', 'value' => 'Validate now'        , 'onclick' => "location.href=\"/utils/validate-email.html?id={$this->ms_new_user}\""),
+										array('type' => 'button', 'name' => 'ok'      , 'value' => 'Continue to homepage', 'onclick' => "location.href=\"/\"")),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+	}
+}
+
+new CRegister;
+
+?>

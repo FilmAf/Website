@@ -1,0 +1,88 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlg.php';
+
+class CLogout extends CWndDlg
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWndDlg::constructor();
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title				= 'Logout';
+		$this->ms_include_js		= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+		$this->ms_form_method		= CWnd_DLG_POST;
+		$this->ms_good_redirect		= $this->ms_base_subdomain;
+		$this->ms_cancel_redirect	= '';
+/*
+		switch ( dvdaf3_getvalue('ret', DVDAF3_GET) )
+		{
+		case 'bugs':
+			switch ( $this->ms_base_subdomain )
+			{
+			case 'http://www.filmaf.edu':
+				$this->ms_cancel_redirect = $this->ms_base_subdomain . '/';
+				break;
+			default:
+				$this->ms_cancel_redirect = 'http://bugs.dvdaf.org/';
+				break;
+			}
+			$this->ms_good_redirect = $this->ms_cancel_redirect . 'index.php?logout=done';
+			$this->ms_form_action  .= '?ret=bugs';
+			break;
+		}
+*/
+		switch ( dvdaf3_getvalue('logout', DVDAF3_POST) )
+		{
+		case '1':
+			$this->logoutUser();
+			$this->ms_redirect = $this->ms_good_redirect;
+			break;
+		case '0':
+			$this->ms_redirect = $this->ms_cancel_redirect;
+			break;
+		default:
+			$s_on_cancel = $this->ms_cancel_redirect !== '' ? 'form.logout.value=0;form.submit()' : 'history.go(-1)';
+			$this->ma_fields = array(
+			'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+								 'flags' => 0,
+								 'label' => "Logout"),
+
+			'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' => "<p>Are you sure you want to logout?</p>"),
+
+			'logout'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+			'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+								 'flags' => 0,
+								 'label' => '',
+								 'opt'   => array(
+											array('type' => 'button', 'name' => 'cancel', 'value' => 'No thanks, I changed my mind', 'onclick' => $s_on_cancel),
+											array('type' => 'submit', 'name' => 'ok'    , 'value' => 'Yes, log me out'			   , 'onclick' => '')),
+								 'input'=> CWnd_DLG_INPUT_BUTTONS));
+			break;
+		}
+	}
+
+	function validateDataSubmission()
+	{
+		$this->mn_action = CWnd_INPUT_PROMPT;
+	}
+
+	function drawBodyPage() // <<-------------------------------<< 7.2
+	{
+		CWndDlg::drawBodyPage();
+	}
+}
+
+new CLogout;
+
+?>

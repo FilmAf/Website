@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#p0/###    small                *.gif +++ already populated
+#p1/###    medium               *.jpg --- to be populated
+#p2/###    large                *.jpg -
+#p3/###    huge                 *.jpg -
+#p4/###    original display     *.jpg --- to be populated
+#p5/###    edited               *.pgn
+#p6/###    original             *.jpg +++
+#uploads   unprocessed pics     *.jpg, *.gif, *.bmp, *.png
+
+for i in `seq -f%03g 0 999`; do
+    cd /var/www/html/p6/$i
+    echo "Processing /var/www/html/p6/$i"
+    for k in $( ls *.jpg); do
+	eval "convert /var/www/html/p6/$i/$k -border 15x15 miff:- | composite -gravity northeast /var/www/html/icons/checker-v.gif - miff:- | composite -gravity northwest /var/www/html/icons/checker-v.gif - miff:- | composite -gravity southwest /var/www/html/icons/checker-h.gif - miff:- | composite -gravity northwest /var/www/html/icons/checker-h.gif - miff:- | composite -gravity center -dissolve 40 -type TruecolorMatte /var/www/html/icons/filmaf.miff - -quality 90 /var/www/html/p4/$i/$k"
+    done
+    chmod 666 /var/www/html/p4/$i/*
+    chmod 777 /var/www/html/p4/$i
+done
+
+echo "done."
+

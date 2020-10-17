@@ -1,0 +1,42 @@
+#!/bin/bash
+# all filenames with no path and no extension
+
+old_source="$1"
+shift
+old_version="$1"
+shift
+old_subversion="$1"
+shift
+copy_p6="$1"
+shift
+new_source="$1"
+shift
+new_target="$1"
+#dir="${1:3:3}"
+shift
+# [bo|nb|hd|bd|kr|kw|sc]
+# transform instructions...
+
+if [ "$old_source" != "-" ]; then
+    #echo /var/www/html/shell/save-old $old_source $old_version $old_subversion $copy_p6
+    /var/www/html/shell/save-old $old_source $old_version $old_subversion $copy_p6
+fi
+
+if [ "$new_source" != "-" ]; then
+    #echo /var/www/html/shell/save-new $new_source $new_target
+    /var/www/html/shell/save-new $new_source $new_target
+fi
+
+#echo /var/www/html/shell/propagate-new $new_target $*
+/var/www/html/shell/propagate-new $new_target $*
+
+rm -f /$new_source 2> /dev/null
+
+#rsync -az -e "ssh -p 9366 -i /home/bkuser/.ssh/ganymede-rsync-key" /var/www/html/p0/$dir/ bkuser@74.55.181.218/www-pics/p0/$dir
+#rsync -az -e "ssh -p 9366 -i /home/bkuser/.ssh/ganymede-rsync-key" /var/www/html/p1/$dir/ bkuser@74.55.181.218/www-pics/p1/$dir
+#rsync -az -e "ssh -p 9366 -i /home/bkuser/.ssh/ganymede-rsync-key" /var/www/html/p2/$dir/ bkuser@74.55.181.218/www-pics/p2/$dir
+#rsync -az -e "ssh -p 9366 -i /home/bkuser/.ssh/ganymede-rsync-key" /var/www/html/p3/$dir/ bkuser@74.55.181.218/www-pics/p3/$dir
+#rsync -az -e "ssh -p 9366 -i /home/bkuser/.ssh/ganymede-rsync-key" /var/www/html/p4/$dir/ bkuser@74.55.181.218/www-pics/p4/$dir
+#rsync -az -e "ssh -p 9366 -i /home/bkuser/.ssh/ganymede-rsync-key" /var/www/html/p5/$dir/ bkuser@74.55.181.218/www-pics/p5/$dir
+#rsync -az -e "ssh -p 9366 -i /home/bkuser/.ssh/ganymede-rsync-key" /var/www/html/p6/$dir/ bkuser@74.55.181.218/www-pics/p6/$dir
+

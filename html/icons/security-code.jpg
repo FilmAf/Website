@@ -1,0 +1,130 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+$gs_host    = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : 'www.filmaf.com';
+$gs_host	= str_replace('dvdaf.','filmaf.',$gs_host);
+$gs_db_host = strpos($gs_host,'filmaf.com') !== false ? '10.80.225.130' : 'localhost';
+
+//
+// Get the internal verification number based on the external one
+//
+$s_external = '';
+$s_internal = '';
+
+$cn = @mysql_pconnect('localhost', 'dvdaf', 'dvdaf');
+$db = @mysql_select_db('dvdaf', $cn);
+$ss = '';
+
+if ( isset($_GET['id']) )
+{
+	$s_external = preg_replace('/[^0-9a-zA-Z]/', '-', $_GET['id']);
+	if ( is_numeric($s_external) )
+	{
+		$ss = "SELECT internal_id FROM human_check WHERE external_id = '$s_external'";
+		$rr = @mysql_query($ss, $cn);
+		if ( $rr > 0 )
+		{
+			$rt = @mysql_fetch_assoc($rr);
+			@mysql_free_result($rr);
+			if ( isset($rt['internal_id']) )
+				$s_internal = $rt['internal_id'];
+		}
+	}
+}
+
+if ( $s_internal == '' )
+{
+	$xs_user  = isset($_COOKIE['user']) ? $_COOKIE['user'] : '-'; if ( ! $xs_user  ) $xs_user  = '-';
+	$xs_ip    = $_SERVER['REMOTE_ADDR' ]; if ( ! $xs_ip    ) $xs_ip    = '-';
+	$xs_host  = $_SERVER['HTTP_HOST'   ]; if ( ! $xs_host  ) $xs_host  = '-';
+	$xs_url   = $_SERVER['SCRIPT_URL'  ]; if ( ! $xs_url   ) $xs_url   = '-';
+	$xs_query = $_SERVER['QUERY_STRING']; if ( ! $xs_query ) $xs_query = '-';
+	$xs_msg   = str_replace("'", "_", $ss); if ( ! $xs_msg ) $xs_msg   = '-';
+	$xss      = "INSERT INTO debug_msg (user_id, ip, host, url, query, msg, created_tm) ".
+				"VALUES ('{$xs_user}', '{$xs_ip}', '{$xs_host}', '{$xs_url}', '{$xs_query}', '{$xs_msg}', now())";
+	@mysql_query($xss, $cn);
+
+	$s_internal = "Error";
+}
+$n_internal = strlen($s_internal);
+
+//
+// Create image
+//
+$image_x	 = 160;
+$image_y	 = 40;
+$im			 = imageCreate($image_x,$image_y);
+$color_white = imageColorAllocate($im, 255, 255, 255);
+
+$a_font = array('tomnr.ttf'			,
+				'times.ttf'			,
+				'hockey.ttf'		,
+				'davis.ttf'			,
+				'px10.ttf'			,
+				'colophon.ttf'		,
+				'ChalkboardBold.ttf',
+				'Sathu.ttf'			,
+				'bboron.ttf'		,
+				'robot.ttf'			);
+$x_grid_color = imageColorAllocate($im,0x89,0xae,0xcf);
+$a_col	= array(
+				imageColorAllocate($im,0xbd,0x0b,0x0b),
+				imageColorAllocate($im,0x3e,0x71,0x9e),
+				imageColorAllocate($im,0x50,0x84,0xb1),
+				imageColorAllocate($im,0xde,0x41,0x41),
+				imageColorAllocate($im,0xa6,0x95,0x00),
+				imageColorAllocate($im,0x57,0xaf,0x63));
+$n_font = count($a_font);
+$n_col  = count($a_col);
+
+//
+// Grid lines
+//
+//$no_x_lines = ($image_x - 1) / 10;
+//for ( $i = 0; $i <= $no_x_lines; $i++ ) imageLine( $im, $i * $no_x_lines, 0, $i * $no_x_lines, $image_y, $x_grid_color );
+//$no_y_lines = ($image_y - 1) / 5;
+//for ( $i = 0; $i <= $no_y_lines; $i++ ) imageLine( $im, 0, $i * $no_y_lines, $image_x, $i * $no_y_lines, $x_grid_color );
+
+//$a_rnd = array(
+//				imagecolorallocate($im,159,159,159),
+//				imagecolorallocate($im,175,175,175),
+//				imagecolorallocate($im,191,191,191),
+//				imagecolorallocate($im,207,207,207));
+//for( $i = 0; $i < $image_x; $i++ )
+//{
+//	for( $j = 0; $j < $image_y ; $j++ )
+//	{
+//		$k = rand(0,16);
+//		if ( $k < 4 )
+//			imagesetpixel($im, $i, $j, $a_rnd[$k]);
+//	}
+//}
+
+//
+// Text
+//
+$text_bbox = imageTTFbbox(20, 0, $a_font[0], $s_internal);
+$sx = ($image_x - ($text_bbox[2] - $text_bbox[0])) / 2;
+$sy = ($image_y - ($text_bbox[1] - $text_bbox[7])) / 2;
+$sy -= $text_bbox[7];
+$dx = ($text_bbox[2] - $text_bbox[0]) / $n_internal + 8;
+$sx = $sx - $n_internal * 3;
+
+for ( $i = 0  ;  $i < $n_internal  ; $i++ )
+	imageTTFtext($im, 20, rand(-25,25), $sx + $i * $dx - 3, $sy+rand(-3,2), $a_col[rand(0,$n_col-1)], $a_font[rand(0,$n_font-1)], $s_internal{$i});
+
+//
+// Return Image
+//
+@header("Content-Type: image/jpeg");
+imageJPEG($im);
+imageDestroy($im);
+
+?>
+

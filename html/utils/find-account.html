@@ -1,0 +1,199 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+require $gs_root.'/lib/CUserUtils.php';
+
+class CFindAccount extends CWndDlgStep
+{
+    function constructor() // <<--------------------------------<< 1.0
+    {
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title					= 'Find Film Aficionado Account';
+		$this->ms_include_js			= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+
+		$this->ma_user_id				= array();
+		$this->ma_count					= array();
+		$this->ma_joined				= array();
+		$this->ms_email					= '';
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= true;
+		$this->ma_steps[0]['validate']	= true;
+		$this->ma_steps[0]['redirect']	= '';
+		$this->ma_steps[1]				= array();
+		$this->ma_steps[1]['seed']		= false;
+		$this->ma_steps[1]['validate']	= false;
+		$this->ma_steps[1]['redirect']	= '';
+    }
+
+    function initStep_0()
+    {
+		$this->ma_fields = array(
+			'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+								 'flags' => 0,
+								 'label' => $this->ms_title),
+
+			'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+			'email'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => 0, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 64, 'uparm' => DVDAF3_POST,
+								 'label' => "Email address".
+											"<p>This should be the email address currently associated with the Film Aficionado account. If you ".
+											"have or have had multiple email addresses you may need to try each one of them.</p>"),
+
+			'code_int'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='12'", 'min' => 0, 'max' =>  8, 'uparm' => DVDAF3_POST,
+								 'label' => "Security Code Confirmation".
+											"<p>".
+											  "Please enter the 6 characters shown in the image.<br />".
+											  "<img src='{$this->ms_base_subdomain}/icons/security-code.jpg?id=______' alt='Security code' />".
+											"</p>"),
+
+			'code_ext'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '0'),
+
+			'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+								 'flags' => 0,
+								 'label' => '',
+								 'opt'   => array(
+											array('type' => 'button', 'name' => 'cancel', 'value' => 'No thanks, I changed my mind', 'onclick' => "history.go(-1)"),
+											array('type' => 'submit', 'name' => 'ok'    , 'value' => 'Find account'                , 'onclick' => '')),
+								 'input' => CWnd_DLG_INPUT_BUTTONS));
+
+		$this->ms_onsubmit = 'FindAccount.validate()';
+    }
+
+    function validateStep_0()
+    {
+		CWndDlg::validateDataSubmission();
+		if ( $this->mn_action == CWnd_INPUT_GOOD )
+		{
+			$s_email	 =        $this->ma_fields['email'   ]['value'];
+			$s_code_int	 =		  $this->ma_fields['code_int']['value'];
+			$n_code_ext	 = intval($this->ma_fields['code_ext']['value']);
+			$b_error_msg = false;
+
+			if ( $s_email )
+			{
+				CForm::valEmail($b_error_msg, $this->ma_fields['email'   ], $s_email);
+				$s_sql = "SELECT user_id, user_id old_user_id, user_id is_null_user, ".
+								"(SELECT b.dvdaf_user_created_tm FROM dvdaf_user b WHERE a.user_id = b.user_id) joined, ".
+								"(SELECT count(*) FROM v_my_dvd_pub b WHERE a.user_id = b.user_id) count ".
+							"FROM dvdaf_user_2 a ".
+						   "WHERE email = '{$s_email}' or email_proposed = '{$s_email}' ".
+						   "ORDER BY joined desc, user_id";
+			}
+			else
+			{
+				$this->ms_error_msg = 'Please enter either an email address.';
+				$this->mn_action    = CWnd_INPUT_ERROR;
+				return;
+			}
+			CForm::valSecurityCode($b_error_msg, $this->ma_fields['code_int'], $n_code_ext, $s_code_int);
+
+			if ( ! $b_error_msg )
+			{
+				if ( ($rr = CSql::query($s_sql, 0,__FILE__,__LINE__)) )
+				{
+					while ( $a_row = CSql::fetch($rr) )
+					{
+						$this->ma_user_id[] = $a_row['user_id'];
+						$this->ma_count[]   = $a_row['count'];
+						$this->ma_joined[]  = $a_row['joined'];
+					}
+				}
+				CSql::free($rr);
+				if ( count($this->ma_user_id) == 0 )
+				{
+					$this->ma_fields['email']['valid'] = false;
+					$this->ma_fields['email']['error'] = "There are no Film Aficionado members using this email address. You/him/her must have signed up using ".
+														 "a different email or perhaps registered and did not validate the account within 24 hours. ".
+														 "If you are not a Film Aficionado member you can <a href='/utils/register.html'>quickly sign up for a".
+														 "free account</a>. Don't worry, we do not spam.";
+					$b_error_msg = true;
+				}
+				else
+				{
+					$this->ms_email  = $s_email;
+				}
+			}
+
+			if ( $b_error_msg )
+			{
+				$this->ms_error_msg = 'Please see below for details.';
+				$this->mn_action    = CWnd_INPUT_ERROR;
+			}
+		}
+    }
+
+    function initStep_1()
+    {
+		$n_matches = count($this->ma_user_id);
+		$s_name    = '';
+
+		for ( $i = 0 ; $i < $n_matches ; $i++ )
+		{
+			$s_name .=	"<tr>".
+						  "<td><p>". CUserUtils::getUserDomain($this->ma_user_id[$i],true) ."</p></td>".
+						  "<td><p style='color:#6c6;padding:0 9px 0 20px;text-align:right'>{$this->ma_count[$i]}</p></td>".
+						  "<td><p style='color:#6c6;padding-left:20px'>{$this->ma_joined[$i]}</p></td>".
+						"</tr>";
+		}
+
+		if ( $s_name )
+		{
+			$s_name = "".
+						"<table>".
+						  "<tr>".
+							"<td><p style='color:#999;padding:0 0 4px 0;text-decoration:underline'>user name</p></td>".
+							"<td><p style='color:#999;padding:0 0 4px 20px;text-decoration:underline'>listings</p></td>".
+							"<td><p style='color:#999;padding:0 0 4px 20px;text-decoration:underline'>member since</p></td>".
+						  "</tr>".
+						  $s_name.
+						"</table>".
+					  "";
+		}
+
+		$s_crit = "email address '{$this->ms_email}'";
+
+		$this->ma_fields = array(
+			'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+								 'flags' => 0,
+								 'label' => $this->ms_title),
+
+			'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' => "<p>".
+											  ( $n_matches > 1
+												? "We found $n_matches members with the {$s_crit}. We encourage you to ".
+												  "<a href='/utils/del-account.html'>delete old accounts</a> so that ".
+												  "everyone can enjoy faster response times on our little site."
+												: "We found one member with the {$s_crit}.").
+											"</p>".
+											"<p>&nbsp;</p>".
+											"<p>$s_name</p>".
+											"<p>&nbsp;</p>".
+											"<p>Thanks!</p>"),
+
+			'enter'		=> array('kind'	 => CWnd_DLG_KIND_RESPONSE,
+								 'flags' => 0,
+								 'label' => '',
+								 'opt'   => array(
+											array('type' => 'button', 'name' => 'login', 'value' => 'Login'               , 'onclick' => "location.href=\"/utils/login.html\""),
+											array('type' => 'button', 'name' => 'ok'   , 'value' => 'Continue to homepage', 'onclick' => "location.href=\"/\"")),
+								 'input' => CWnd_DLG_INPUT_BUTTONS));
+		if ( $this->mb_logged_in_this_sess		) array_shift($this->ma_fields['enter']['opt']);
+    }
+}
+
+new CFindAccount;
+
+?>

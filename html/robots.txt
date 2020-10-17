@@ -1,0 +1,27 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+if ( isset($_SERVER['HTTP_USER_AGENT']) )
+	if ( stripos($_SERVER['HTTP_USER_AGENT'],'Googlebot') === false )
+		echo "User-agent: *\n".
+			 "Disallow: /\n";
+	else
+		echo "User-agent: *\n".
+			 "Disallow: /*pm=one*\n".
+			 "Disallow: /*pm=prn*\n".
+			 "Disallow: /who.html*\n".
+			 "Disallow: /gd/*\n".
+			 "Disallow: /gp/*\n".
+			 "Disallow: /search.html*\n".
+			 "Disallow: /releases.html*\n".
+			 "Disallow: /price-one.html*\n";
+else
+	echo "User-agent: *\nDisallow: /\n";
+
+?>

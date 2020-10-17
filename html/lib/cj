@@ -1,0 +1,506 @@
+#!/bin/bash
+
+chmod 600 *.js
+
+##########################################################
+#base for screen with menu and search bar
+cat \
+jin-ajax.js \
+jin-arrays.js \
+jin-checkbox.js \
+jin-context.js \
+jin-cookie.js \
+jin-datetime.js \
+jin-dbl.js \
+jin-dec.js \
+jin-dom.js \
+jin-dropdown.js \
+jin-filmaf.js \
+jin-edit.js \
+jin-explain.js \
+jin-img.js \
+jin-isearch.js \
+jin-menus.js \
+jin-mini-search.js \
+jin-pop.js \
+jin-search.js \
+jin-search-calendar.js \
+jin-search-pre.js \
+jin-search-act.js \
+jin-str.js \
+jin-upc.js \
+jin-url.js \
+jin-validate.js \
+jin-win.js \
+jin-ul-explain.js \
+jin-ul-search.js \
+> b.js
+
+##########################################################
+#base for screen with menu and NO search bar
+cat \
+jin-context.js \
+jin-cookie.js \
+jin-dom.js \
+jin-filmaf.js \
+jin-explain.js \
+jin-menus.js \
+jin-win.js \
+jin-ul-explain.js \
+> c.js
+
+##########################################################
+#echo "cat-edit-obj.js"
+cat \
+c.js \
+mil-edit-obj.js \
+mil-edit-dvd.js \
+mil-edit-film.js \
+mil-edit-person.js \
+mil-edit-pub.js \
+jin-ajax.js \
+jin-asin.js \
+jin-birth.js \
+jin-datetime.js \
+jin-dbl.js \
+jin-dec.js \
+jin-decode.js \
+jin-dropdown.js \
+jin-edit.js \
+jin-expand.js \
+jin-imdb.js \
+jin-img.js \
+jin-img-spin.js \
+jin-matrix.js \
+jin-mini-search.js \
+jin-person.js \
+jin-pub.js \
+jin-region.js \
+jin-str.js \
+jin-undo.js \
+jin-upc.js \
+jin-url.js \
+jin-validate.js \
+jin-wiki.js \
+jin-ul-aspect.js \
+jin-ul-birth.js \
+jin-ul-country.js \
+jin-ul-dir.js \
+jin-ul-genre.js \
+jin-ul-lang.js \
+jin-ul-person.js \
+jin-ul-pub.js \
+jin-ul-rating.js \
+jin-ul-region.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-edit-obj.js 2>/dev/null
+#cp a.js cat-edit-obj.js
+rm -f a.js
+chmod 644 cat-edit-obj.js
+#jin-xml.js \
+
+##########################################################
+#echo "cat-main.js"
+cat \
+b.js \
+jin-cart.js \
+jin-dir-xp.js \
+jin-facebook.js jin-img-spun.js jin-tab.js jin-tbl-menu.js jin-button.js jin-radio.js \
+jin-img-pop.js \
+jin-ul-blog.js \
+jin-ul-main.js \
+mil-dvd-list.js \
+mil-main.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-main.js 2>/dev/null
+#cp a.js cat-main2.js
+#cp a.js cat-main.js
+rm -f a.js
+chmod 644 cat-main.js
+#chmod 644 cat-main2.js
+
+##########################################################
+#echo "cat-filmgp.js
+cat \
+jin-ajax.js \
+jin-context.js \
+jin-cookie.js \
+jin-datetime.js \
+jin-dec.js \
+jin-dom.js \
+jin-edit.js \
+jin-facebook.js jin-img-spun.js jin-tab.js jin-tbl-menu.js jin-button.js jin-radio.js \
+jin-filmaf.js \
+jin-img.js \
+jin-img-pop.js \
+jin-menus.js \
+jin-str.js \
+jin-ul-blog.js \
+mil-dvd-list.js \
+mil-filmgp.js \
+\
+jin-cart.js \
+jin-pop.js \
+jin-search-pre.js \
+jin-ul-main.js \
+jin-win.js \
+mil-main.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-filmgp.js 2>/dev/null
+#cp a.js cat-filmgp.js
+rm -f a.js
+chmod 644 cat-filmgp.js
+
+##########################################################
+#echo "cat-import.js"
+cat \
+b.js \
+mil-upc-import.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-import.js 2>/dev/null
+#cp a.js cat-import.js
+rm -f a.js
+chmod 644 cat-import.js
+
+##########################################################
+#echo "cat-wnd-menu.js"
+cat \
+b.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-wnd-menu.js 2>/dev/null
+#cp a.js cat-wnd-menu.js
+rm -f a.js
+chmod 644 cat-wnd-menu.js
+
+##########################################################
+#echo "cat-edit.js"
+cat \
+c.js \
+jin-tab.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-edit.js 2>/dev/null
+#cp a.js cat-edit.js
+rm -f a.js
+chmod 644 cat-edit.js
+
+#
+##########################################################
+#echo "cat-dvd-list.js"
+cat \
+b.js \
+\
+jin-cart.js \
+jin-dir-xp.js \
+jin-facebook.js jin-img-spun.js jin-tab.js jin-tbl-menu.js jin-button.js jin-radio.js \
+jin-img-spin.js \
+jin-img-pop.js \
+jin-jump.js \
+jin-kbd.js \
+jin-page-size.js \
+jin-splash.js \
+jin-undo.js \
+jin-ul-blog.js \
+jin-ul-dvd.js \
+jin-ul-jump.js \
+jin-ul-page-size.js \
+mil-dvd-list.js \
+mil-dvd-list-pre.js \
+mil-dvd-list-act.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-dvd-list.js 2>/dev/null
+#cp a.js cat-dvd-list.js
+rm -f a.js
+chmod 644 cat-dvd-list.js
+
+##########################################################
+#echo "cat-dvd-mine.js"
+cat \
+b.js \
+\
+jin-cart.js \
+jin-dir-xp.js \
+jin-facebook.js jin-img-spun.js jin-tab.js jin-tbl-menu.js jin-button.js jin-radio.js \
+jin-img-spin.js \
+jin-img-pop.js \
+jin-jump.js \
+jin-kbd.js \
+jin-page-size.js \
+jin-splash.js \
+jin-undo.js \
+jin-ul-blog.js \
+jin-ul-dvd.js \
+jin-ul-jump.js \
+jin-ul-page-size.js \
+mil-dvd-list.js \
+mil-dvd-list-pre.js \
+mil-dvd-list-act.js \
+\
+jin-ul-genre.js \
+jin-ul-stars.js \
+mil-dvd-mine.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-dvd-mine.js 2>/dev/null
+#cp -f a.js cat-dvd-mine.js
+chmod 644 cat-dvd-mine.js
+
+##########################################################
+#echo "cat-cart.js"
+cat \
+b.js \
+\
+jin-cart.js \
+jin-img-pop.js \
+jin-ul-blog.js \
+jin-ul-dvd.js \
+mil-dvd-list.js \
+mil-dvd-list-pre.js \
+mil-dvd-list-act.js \
+\
+mil-dvd-price.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-cart.js 2>/dev/null
+#cp a.js cat-cart.js
+chmod 644 cat-cart.js
+
+#########################################################
+#echo "cat-price.js"
+cat \
+jin-cookie.js \
+jin-dbl.js \
+jin-dec.js \
+jin-dropdown.js \
+jin-filmaf.js \
+jin-str.js \
+jin-win.js \
+\
+mil-dvd-price.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-price.js 2>/dev/null
+#cp a.js cat-price.js
+chmod 644 cat-price.js
+
+##########################################################
+#echo "cat-home.js"
+cat \
+b.js \
+jin-agent.js \
+jin-context.js \
+jin-datetime.js \
+jin-dbl.js \
+jin-dec.js \
+jin-email.js \
+jin-encode.js \
+jin-facebook.js jin-img-spun.js jin-tab.js jin-tbl-menu.js jin-button.js jin-radio.js \
+jin-img-spin.js \
+jin-img-pop.js \
+jin-jump.js \
+jin-kbd.js \
+jin-myspace.js \
+jin-undo.js \
+jin-win.js \
+jin-youtube.js \
+jin-ul-blog.js \
+jin-ul-dvd.js \
+jin-ul-jump.js \
+jin-ul-profile.js \
+jin-ul-microblog.js \
+jin-ul-friends.js \
+mil-dvd-list.js \
+mil-dvd-list-act.js \
+mil-dvdstats-painter.js \
+mil-dvdstats.js \
+mil-favvideos.js \
+mil-favvideos-painter.js \
+mil-friend-invite.js \
+mil-friends.js \
+mil-friends-painter.js \
+mil-home.js \
+mil-microblog.js \
+mil-microblog-painter.js \
+mil-profile.js \
+mil-options.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-home.js 2>/dev/null
+#cp a.js cat-home.js
+rm -f a.js
+chmod 644 cat-home.js
+
+##########################################################
+#echo "cat-folders.js"
+cat \
+b.js \
+jin-img-spin.js \
+jin-undo.js \
+mil-folders.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-folders.js 2>/dev/null
+#cp -f a.js cat-folders.js
+chmod 644 cat-folders.js
+
+##########################################################
+#echo "cat-register.js"
+cat \
+jin-cookie.js \
+jin-dec.js \
+jin-dom.js \
+jin-filmaf.js \
+jin-email.js \
+jin-str.js \
+jin-validate.js \
+jin-win.js \
+mil-register.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-register.js 2>/dev/null
+#cp -f a.js cat-register.js
+chmod 644 cat-register.js
+
+##########################################################
+#echo "cat-dvd-edit.js"
+cat \
+jin-ajax.js \
+jin-asin.js \
+jin-context.js \
+jin-cookie.js \
+jin-datetime.js \
+jin-dbl.js \
+jin-dec.js \
+jin-decode.js \
+jin-dropdown.js \
+jin-dom.js \
+jin-filmaf.js \
+jin-edit.js \
+jin-expand.js \
+jin-explain.js \
+jin-imdb.js \
+jin-img.js \
+jin-img-spin.js \
+jin-img-pop.js \
+jin-menus.js \
+jin-mini-search.js \
+jin-region.js \
+jin-str.js \
+jin-tab.js \
+jin-title.js \
+jin-undo.js \
+jin-upc.js \
+jin-url.js \
+jin-validate.js \
+jin-win.js \
+jin-ul-country.js \
+jin-ul-dir.js \
+jin-ul-dvd-title.js \
+jin-ul-explain.js \
+jin-ul-genre.js \
+jin-ul-lang.js \
+jin-ul-pub.js \
+jin-ul-region.js \
+mil-dvd-edit.js \
+mil-edit-obj.js \
+\
+jin-arrays.js \
+jin-checkbox.js \
+jin-isearch.js \
+jin-pop.js \
+jin-search.js \
+jin-search-calendar.js \
+jin-search-pre.js \
+jin-search-act.js \
+jin-ul-search.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-dvd-edit.js 2>/dev/null
+#cp -f a.js cat-dvd-edit.js
+chmod 644 cat-dvd-edit.js
+
+##########################################################
+#echo "cat-dvd-appr.js"
+cat \
+jin-ajax.js \
+jin-asin.js \
+jin-context.js \
+jin-cookie.js \
+jin-datetime.js \
+jin-dbl.js \
+jin-dec.js \
+jin-decode.js \
+jin-dom.js \
+jin-dropdown.js \
+jin-filmaf.js \
+jin-edit.js \
+jin-expand.js \
+jin-explain.js \
+jin-imdb.js \
+jin-img.js \
+jin-img-spin.js \
+jin-img-pop.js \
+jin-menus.js \
+jin-mini-search.js \
+jin-region.js \
+jin-str.js \
+jin-tab.js \
+jin-title.js \
+jin-undo.js \
+jin-upc.js \
+jin-url.js \
+jin-validate.js \
+jin-win.js \
+jin-ul-country.js \
+jin-ul-dir.js \
+jin-ul-dvd-title.js \
+jin-ul-explain.js \
+jin-ul-genre.js \
+jin-ul-lang.js \
+jin-ul-dvd-cmts.js \
+jin-ul-dvd-pic.js \
+jin-ul-pub.js \
+jin-ul-region.js \
+mil-dvd-edit.js \
+mil-dvd-appr.js \
+mil-dvd-appr-pre.js \
+mil-dvd-appr-act.js \
+mil-edit-obj.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-dvd-appr.js 2>/dev/null
+#cp -f a.js cat-dvd-appr.js
+chmod 644 cat-dvd-appr.js
+
+##########################################################
+#echo "cat-pic-mngt.js"
+cat \
+jin-ajax.js \
+jin-context.js \
+jin-cookie.js \
+jin-datetime.js \
+jin-dbl.js \
+jin-dec.js \
+jin-dom.js \
+jin-filmaf.js \
+jin-edit.js \
+jin-explain.js \
+jin-img.js \
+jin-img-spin.js \
+jin-menus.js \
+jin-seed.js \
+jin-str.js \
+jin-undo.js \
+jin-url.js \
+jin-validate.js \
+jin-win.js \
+jin-ul-explain.js \
+jin-ul-pic-cmts.js \
+jin-ul-pic-mngt.js \
+mil-pic-edit.js \
+mil-pic-mgnt.js \
+mil-edit-obj.js \
+> a.js
+/home/dvdaf/scripts/cruch.pl a.js > cat-pic-mngt.js 2>/dev/null
+#cp -f a.js cat-pic-mngt.js
+chmod 644 cat-pic-mngt.js
+
+##########################################################
+
+rm -f a.js
+rm -f b.js
+rm -f c.js
+
+exit 0
+

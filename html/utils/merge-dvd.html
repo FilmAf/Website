@@ -1,0 +1,119 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWnd.php';
+
+class CMergeDvd extends CWnd
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWnd::constructor();
+		$this->ms_title				= 'Film Aficionado Merge DVD';
+		$this->mb_get_user_status	= true;
+	}
+
+	function run($ss)
+	{
+		$n_rows = 0;
+		echo "<div style='margin:10px 10px 0 0'>{$ss}</div>\n";
+		$n_rows = CSql::query_and_free($ss, 0,__FILE__,__LINE__);
+		echo "<div style='margin:0 10px 10px 10px;color:red'>{$n_rows} row".($n_rows == 1 ? '' : 's')." affected.</div>\n";
+	}
+
+	function drawBodyPage()
+	{
+		$s_remote_addr = dvdaf3_getvalue('REMOTE_ADDR', DVDAF3_SERVER);
+		$this->mb_mod  = $this->ms_user_id == 'ash' && (substr($s_remote_addr,0,10) == '192.168.1.' || $s_remote_addr == '68.199.104.205');
+
+		if ( ! $this->mb_mod )
+		{
+			$this->ms_display_error = "This function is only available to Ed.";
+			$this->drawMessages(true,false);
+			return;
+		}
+
+		$n_keep_id = dvdaf3_getvalue('keep', DVDAF3_GET|DVDAF3_INT);
+		$n_del_id  = dvdaf3_getvalue('del' , DVDAF3_GET|DVDAF3_INT);
+
+		echo "<h1>Merge DVD</h1>";
+
+		if ( $n_keep_id <= 0 || $n_del_id <= 0 )
+		{
+			$s_url  = dvdaf3_getvalue('SCRIPT_URL',DVDAF3_SERVER);
+
+			echo  "<div style='margin:20px'>".
+					"<form action='{$s_url}' method='get'>".
+					  "<table class='no_border' style='margin:20px 0 20px 0'>".
+						"<tr>".
+						  "<td style='padding:2px'>Keep:</td>".
+						  "<td style='padding:2px'><input type='text' name='keep' /></td>".
+						  "<td style='padding:2px'>&nbsp;</td>".
+						"</tr>".
+						"<tr>".
+						  "<td style='padding:2px'>Delete:</td>".
+						  "<td style='padding:2px'><input type='text' name='del' /></td>".
+						  "<td style='padding:2px'><input type='submit' name='go' value='Submit' /></td>".
+						"</tr>".
+					  "</table>".
+					"</form>".
+				  "</div>";
+			return;
+		}
+
+		$this->run ("UPDATE IGNORE my_dvd SET dvd_id = {$n_keep_id} WHERE dvd_id = {$n_del_id} ",__FILE__,__LINE__);
+		$this->run ("DELETE FROM my_dvd WHERE dvd_id = {$n_del_id}",__FILE__,__LINE__);
+		$this->run ("UPDATE IGNORE my_dvd_2 SET dvd_id = {$n_keep_id} WHERE dvd_id = {$n_del_id} ",__FILE__,__LINE__);
+		$this->run ("DELETE FROM my_dvd_2 WHERE dvd_id = {$n_del_id}",__FILE__,__LINE__);
+
+		$this->run ("UPDATE dvd SET dvd_id_merged = {$n_keep_id} WHERE dvd_id = {$n_del_id} ",__FILE__,__LINE__);
+
+		$this->run ("INSERT INTO dvd_hist (".
+						   "dvd_id, version_id, dvd_title, film_rel_year, director, publisher, orig_language, country, region_mask, genre, media_type, num_titles, ".
+						   "num_disks, source, rel_status, film_rel_dd, dvd_rel_dd, dvd_oop_dd, imdb_id, pic_status, pic_name, list_price, sku, upc, asin, amz_country, dvd_created_tm, ".
+						   "dvd_updated_tm, dvd_updated_by, dvd_id_merged, last_justify, dvd_verified_tm, dvd_verified_by, verified_version, dvd_edit_id) ".
+					"SELECT dvd_id, version_id, dvd_title, film_rel_year, director, publisher, orig_language, country, region_mask, genre, media_type, num_titles, ".
+						   "num_disks, source, rel_status, film_rel_dd, dvd_rel_dd, dvd_oop_dd, imdb_id, pic_status, pic_name, list_price, sku, upc, asin, amz_country, dvd_created_tm, ".
+						   "dvd_updated_tm, dvd_updated_by, dvd_id_merged, last_justify, dvd_verified_tm, dvd_verified_by, verified_version, dvd_edit_id ".
+					  "FROM dvd a ".
+					 "WHERE dvd_id = {$n_del_id} ".
+					   "and not exists (SELECT 1 FROM dvd_hist b WHERE a.dvd_id = b.dvd_id and a.version_id = b.version_id)",
+					__FILE__,__LINE__);
+
+		$this->run ("INSERT INTO dvd_submit (".
+						   "dvd_id, request_cd, disposition_cd, proposer_id, proposer_notes, proposed_tm, ".
+						   "updated_tm, reviewer_id, reviewer_notes, reviewed_tm, hist_version_id, dvd_title, film_rel_year, director, publisher, ".
+						   "orig_language, country, region_mask, genre, media_type, num_titles, num_disks, source, rel_status, film_rel_dd, dvd_rel_dd, dvd_oop_dd, ".
+						   "imdb_id, list_price, sku, upc, asin, amz_country, update_justify, creation_seed) ".
+					"SELECT dvd_id, 'D' request_cd, 'A' disposition_cd, 'ashirg' proposer_id, 'Duplicate of {$n_keep_id}' proposer_notes, now() proposed_tm, ".
+						   "now() updated_tm, 'ash' reviewer_id, '-' reviewer_notes, now() reviewed_tm, version_id hist_version_id, dvd_title, film_rel_year, director, publisher, ".
+						   "orig_language, country, region_mask, genre, media_type, num_titles, num_disks, source, rel_status, film_rel_dd, dvd_rel_dd, dvd_oop_dd, ".
+						   "imdb_id, list_price, sku, upc, asin, amz_country, 'Duplicate' update_justify, '-' creation_seed ".
+					  "FROM dvd ".
+					 "WHERE dvd_id = {$n_del_id}",
+					__FILE__,__LINE__);
+
+		$this->run ("DELETE FROM dvd WHERE dvd_id = {$n_del_id}",
+					__FILE__,__LINE__);
+
+		$this->run ("UPDATE IGNORE my_dvd SET dvd_id = {$n_keep_id} WHERE dvd_id = {$n_del_id} ",__FILE__,__LINE__);
+		$this->run ("DELETE FROM my_dvd WHERE dvd_id = {$n_del_id}",__FILE__,__LINE__);
+		$this->run ("UPDATE IGNORE my_dvd_2 SET dvd_id = {$n_keep_id} WHERE dvd_id = {$n_del_id} ",__FILE__,__LINE__);
+		$this->run ("DELETE FROM my_dvd_2 WHERE dvd_id = {$n_del_id}",__FILE__,__LINE__);
+
+		echo "<div>done.</div>".
+			 "<div style='margin-top:20px'>Run the following after done</div>".
+			 "<div>DELETE FROM search_all_1 WHERE dvd_id not in (SELECT dvd_id FROM dvd);</div>".
+			 "<div>DELETE FROM search_all_2 WHERE dvd_id not in (SELECT dvd_id from dvd);</div>";
+	}
+}
+
+new CMergeDvd;
+
+?>

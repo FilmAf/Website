@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/usr/local/bin/php -c /etc/httpd/conf/php-cli.ini -f /var/www/html/shell/send-mail.php >> /dev/null 2>&1 &
+

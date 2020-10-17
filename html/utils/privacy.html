@@ -1,0 +1,54 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+
+class CPrivacy extends CWndDlgStep
+{
+	function constructor() // <<--------------------<< 1.0
+	{
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title					= 'Privacy Policy';
+		$this->ms_include_js			= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= false;
+		$this->ma_steps[0]['validate']	= false;
+		$this->ma_steps[0]['redirect']	= '';
+	}
+
+	function initStep_0()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+		'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>The only private information Film Aficionado keeps is your email address. We will not sell it to other companies and we do spam.</p>".
+										"<p>The remaining information that you provide to Film Aficionado such as your titles, posts, and comments should be considered public.</p>"),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(array('type' => 'button', 'name' => 'ok', 'value' => 'Back to homepage', 'onclick' => "location.href=\"/\"")),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+	}
+}
+
+new CPrivacy;
+
+?>

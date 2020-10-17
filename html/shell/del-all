@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for i in `seq -f%03g 0 999`;
+do
+    echo deleting $i
+    rm -f ./$i/*
+done
+

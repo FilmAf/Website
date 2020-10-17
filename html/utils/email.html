@@ -1,0 +1,144 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+
+class CChangeEmail extends CWndDlgStep
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title					= 'Update Email Address';
+		$this->ms_include_js			= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+		$this->mb_must_login			= true;
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= true;
+		$this->ma_steps[0]['validate']	= true;
+		$this->ma_steps[0]['redirect']	= '';
+		$this->ma_steps[1]				= array();
+		$this->ma_steps[1]['seed']		= false;
+		$this->ma_steps[1]['validate']	= false;
+		$this->ma_steps[1]['redirect']	= '';
+	}
+
+	function initStep_0()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+		'email'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 64, 'uparm' => DVDAF3_POST,
+							 'label' => "New email address".
+										"<p>You may want to send an empty email to <strong>noreply@filmaf.com</strong> to ensure ".
+										"your email program does not discard your confirmation email as spam.</p>"),
+
+		'pass'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_PASS, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST,
+							 'label' => "Enter your password".
+										"<p>Your password must have at least 3 letters [A-Za-z] or numbers [0-9] with no spaces. Note ".
+										"that passwords are case sensitive ('A' is different than 'a').</p>"),
+		
+		'code_int'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='12'", 'min' => 0, 'max' =>  8, 'uparm' => DVDAF3_POST,
+							 'label' => "Security Code Confirmation".
+										"<p>Please enter the 6 characters shown in the image.<br />".
+										"<img src='{$this->ms_base_subdomain}/icons/security-code.jpg?id=______' alt='Security code' /></p>"),
+
+		'code_ext'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '0'),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(
+										array('type' => 'button', 'name' => 'cancel', 'value' => 'No thanks, I changed my mind', 'onclick' => "history.go(-1)"),
+										array('type' => 'submit', 'name' => 'ok'    , 'value' => 'Update Email Address'        , 'onclick' => '')),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+	}
+
+	function validateStep_0()
+	{
+		CWndDlg::validateDataSubmission();
+		if ( $this->mn_action == CWnd_INPUT_GOOD )
+		{
+			$s_name		 = $this->ms_user_id;
+			$s_email     =        $this->ma_fields['email'   ]['value'];
+			$s_pass      =        $this->ma_fields['pass'    ]['value'];
+			$s_code_int  =		  $this->ma_fields['code_int']['value'];
+			$n_code_ext  = intval($this->ma_fields['code_ext']['value']);
+			$s_hash		 = CSql::query_and_fetch1("SELECT password_hash FROM dvdaf_user WHERE user_id = '$s_name'", 0,__FILE__,__LINE__);
+			$b_error_msg = false;
+
+			$this->ms_new_email = $s_email;
+
+			if ( CForm::valSecurityCode($b_error_msg, $this->ma_fields['code_int'], $n_code_ext, $s_code_int) )
+			{
+				if ( CForm::valNewEmail($b_error_msg, $this->ma_fields['email'], $s_email) )
+				{
+					if ( CForm::valPass($b_error_msg, $this->ma_fields['pass'], $s_pass, $s_hash) )
+					{
+						$s_auth = CSecure::randEmail();
+						CSql::query_and_free("UPDATE dvdaf_user_2 SET email_proposed = '{$s_email}', email_validation_cd = '{$s_auth}' WHERE user_id = '{$s_name}'", 0,__FILE__,__LINE__);
+						CEmail::sendValidationEmailChange($s_name, $s_email, $s_auth);
+					}
+				}
+			}
+
+			if ( $b_error_msg )
+			{
+				$this->ms_error_msg = 'Please see below for details.';
+				$this->mn_action = CWnd_INPUT_ERROR;
+			}
+		}
+	}
+
+	function initStep_1()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => "Updating Email Address"),
+
+		'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>You will be getting a confirmation email at <strong>{$this->ms_new_email}</strong> in ".
+										"a few minutes.  Once you received it click on the link and your new email address will be ".
+										"activated.</p>".
+
+										"<p>&nbsp;</p>".
+										"<p>All the best,</p>".
+										"<p>- The Film Aficionado Team.</p>".
+										"<p>&nbsp;</p>".
+
+										"<p><strong>If you can not find your validation email</strong>: Check your inbox and your ".
+										"junk mail folders. If it is not there in some 5-10 minutes then try sending an empty email ".
+										"to <strong>noreply@filmaf.com</strong>. This will attempt to tell your email program not to ".
+										"discard your registration confirmation. Then request a new validation email from the <a ".
+										"href='{$this->ms_base_subdomain}/utils/login.html'>login screen</a>. Note that after a day ".
+										"accounts that have not been validated are deleted, giving you a chance to try a different ".
+										"email address, etc.</p>"),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(
+								 		array('type' => 'button', 'name' => 'validate', 'value' => 'Validate now'        , 'onclick' => "location.href=\"/utils/validate-email.html?id={$this->ms_user_id}\""),
+										array('type' => 'button', 'name' => 'ok'      , 'value' => 'Continue to homepage', 'onclick' => "location.href=\"/\"")),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+	}
+}
+
+new CChangeEmail;
+
+?>

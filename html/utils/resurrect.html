@@ -1,0 +1,90 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWnd.php';
+
+class CResurrect extends CWnd
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWnd::constructor();
+		$this->ms_title				= 'Film Aficionado Resurrest Submission';
+		$this->mb_get_user_status	= true;
+	}
+
+	function drawBodyPage()
+	{
+		if ( ! $this->mb_mod )
+		{
+			$this->ms_display_error = "This function is only available to modetators.";
+			$this->drawMessages(true,false);
+			return;
+		}
+
+		$n_dvd_edit_id = dvdaf3_getvalue('dvd_edit', DVDAF3_GET|DVDAF3_INT);
+		$n_pic_edit_id = dvdaf3_getvalue('pic_edit', DVDAF3_GET|DVDAF3_INT);
+
+		echo  "<h1>Ressurect Submission</h1>";
+
+		if ( $n_dvd_edit_id <= 0 && $n_pic_edit_id <= 0 )
+		{
+			$s_url  = dvdaf3_getvalue('SCRIPT_URL',DVDAF3_SERVER);
+
+			echo  "<div style='margin:20px'>".
+					"<form action='{$s_url}' method='get'>".
+					  "<table class='no_border' style='margin:20px 0 20px 0'>".
+						"<tr>".
+						  "<td style='padding:2px'>DVD submission id:</td>".
+						  "<td style='padding:2px'><input type='text' name='dvd_edit' /></td>".
+						  "<td style='padding:2px'>&nbsp;</td>".
+						"</tr>".
+						"<tr>".
+						  "<td style='padding:2px'>Picture submission id:</td>".
+						  "<td style='padding:2px'><input type='text' name='pic_edit' /></td>".
+						  "<td style='padding:2px'><input type='submit' name='go' value='Submit' /></td>".
+						"</tr>".
+					  "</table>".
+					"</form>".
+				  "</div>";
+			return;
+		}
+
+		if ( $n_dvd_edit_id > 0 )
+		{
+			if ( CSql::query_and_free("UPDATE dvd_submit SET disposition_cd = '-' WHERE edit_id = {$n_dvd_edit_id}", 0,__FILE__,__LINE__) > 0 )
+				$s_msg = "resurrected";
+			else
+				if ( CSql::query_and_fetch1("SELECT 1 FROM dvd_submit WHERE edit_id = {$n_dvd_edit_id}", 0,__FILE__,__LINE__) > 0 )
+					$s_msg = "already active";
+				else
+					$s_msg = "NOT FOUND";
+
+			echo "<div style='margin:10px'>DVD submission {$n_dvd_edit_id} {$s_msg}.</div>";
+		}
+
+
+		if ( $n_pic_edit_id > 0 )
+		{
+			if ( CSql::query_and_free("UPDATE pic_submit SET disposition_cd = '-' WHERE pic_edit_id = {$n_pic_edit_id}", 0,__FILE__,__LINE__) > 0 )
+				$s_msg = "resurrected";
+			else
+				if ( CSql::query_and_free("SELECT 1 FROM pic_submit WHERE pic_edit_id = {$n_pic_edit_id}", 0,__FILE__,__LINE__) > 0 )
+					$s_msg = "already active";
+				else
+					$s_msg = "NOT FOUND";
+
+			echo "<div style='margin:10px'>Picture submission {$n_pic_edit_id} {$s_msg}.</div>";
+		}
+	}
+}
+
+new CResurrect;
+
+?>

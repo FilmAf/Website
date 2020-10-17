@@ -1,0 +1,196 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndDlgStep.php';
+
+class CDelAccount extends CWndDlgStep
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWndDlgStep::constructor();
+
+		CTrace::log_txt(__CLASS__ .'::'. __FUNCTION__);
+		$this->ms_title					= 'Delete Account';
+		$this->ms_include_js			= "<script language='javascript' type='text/javascript' src='{$this->ms_base_subdomain}/lib/cat-register_{$this->mn_lib_version}.js'></script>\n";
+
+		$this->ma_steps					= array();
+		$this->ma_steps[0]				= array();
+		$this->ma_steps[0]['seed']		= false;
+		$this->ma_steps[0]['validate']	= true;
+		$this->ma_steps[0]['redirect']	= '';
+		$this->ma_steps[1]				= array();
+		$this->ma_steps[1]['seed']		= false;
+		$this->ma_steps[1]['validate']	= false;
+		$this->ma_steps[1]['redirect']	= '';
+	}
+
+	function initStep_0()
+	{
+		$this->ma_fields = array(
+		'_title'	=> array('kind'  => CWnd_DLG_KIND_TITLE,
+							 'flags' => 0,
+							 'label' => $this->ms_title),
+
+		'step'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_VISI_HIDE, 'input' => CWnd_DLG_INPUT_TEXT, 'uparm' => DVDAF3_POST, 'value' => '1'),
+
+		'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+							 'flags' => 0,
+							 'label' => "<p>Please fill in your information below.</p>".
+										"<p>".
+										  "Note that there is no going back after you delete your account. Therefore ".
+										  "we require that you first delete all titles in your collection before ".
+										  "your account itself can be deleted. If you really have you mind set in ".
+										  "leaving us that should not be too much trouble.  However, it may give ".
+										  "others time to pause and think if they really want to undo the all the ".
+										  "work they put into creating an online collection.".  
+										"</p>".
+										"<p>".
+										  "If you do leave us we wish you all the best and we thank you for the time ".
+										  "you spent with us and any contributions you may have made to the site ".
+										  "financially or in content.".
+										"</p>".
+										"<p>".
+										  "Good luck!".
+										"</p>"),
+
+		'name'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED, 'input' => CWnd_DLG_INPUT_TEXT, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST|DVDAF3_LOWER,
+							 'label' => "Please enter your user name".
+										"<p>".
+										  "It will tell us which account to delete. If you do not recall your user ".
+										  "name you can <a href='/utils/find-account.html'>find which ".
+										  "accounts are associated with your email address</a>.".
+										"</p>"),
+
+		'pass'		=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_PASS, 'parm' => "size='36'", 'min' => 0, 'max' => 32, 'uparm' => DVDAF3_POST,
+							 'label' => "Please enter your password".
+										"<p>".
+										  "This is so that people do not delete your account by mistake. If you ".
+										  "forgot your password you can have <a href='/utils/reset-".
+										  "password.html'>a new password sent to you</a>.".
+										"</p>"),
+
+		'reason'	=> array('kind'  => CWnd_DLG_KIND_INPUT, 'flags' => CWnd_DLG_NEED | CWnd_DLG_NOAUTOCOMPL, 'input' => CWnd_DLG_INPUT_TEXTAREA, 'parm' => "rows='5' cols='50'", 'min' => 0, 'max' => 4000, 'uparm' => DVDAF3_POST,
+							 'label' => "Please tell us why you are leaving".
+										"<p>".
+										  "If you spend a couple of minutes typing this up it will help us provide ".
+										  "a better experience for those that do stay. Thanks!".
+										"</p>"),
+
+		'enter'		=> array('kind'  => CWnd_DLG_KIND_RESPONSE,
+							 'flags' => 0,
+							 'label' => '',
+							 'opt'   => array(
+								 		array('type' => 'button', 'name' => 'cancel', 'value' => 'No thanks, I changed my mind', 'onclick' => "location.href=\"/\""),
+										array('type' => 'submit', 'name' => 'ok'    , 'value' => 'Delete my account'		   , 'onclick' => '')),
+							 'input' => CWnd_DLG_INPUT_BUTTONS));
+
+		$this->ms_onsubmit = 'DeleteAccount.validate()';
+	}
+
+	function validateStep_0()
+	{
+		CWndDlg::validateDataSubmission();
+		if ( $this->mn_action == CWnd_INPUT_GOOD )
+		{
+			$s_name		 = $this->ma_fields['name'  ]['value'];
+			$s_pass		 = $this->ma_fields['pass'  ]['value'];
+			$s_reason	 = $this->ma_fields['reason']['value'];
+			$s_hash		 = CSql::query_and_fetch1("SELECT password_hash FROM dvdaf_user WHERE user_id = '$s_name'", 0,__FILE__,__LINE__);
+			$b_error_msg = false;
+
+			if ( $s_hash )
+			{
+				if ( CForm::valPass($b_error_msg, $this->ma_fields['pass'], $s_pass, $s_hash) )
+				{
+					if ( CSql::query_and_fetch1("SELECT count(*) FROM v_my_dvd_ref WHERE user_id = '$s_name'", 0,__FILE__,__LINE__) )
+					{
+						$this->mb_success = false;
+					}
+				}
+			}
+			else
+			{
+				CForm::setUserNotFound($b_error_msg, $this->ma_fields['name'], $s_name);
+			}
+
+			if ( $b_error_msg )
+			{
+				$this->ms_error_msg = 'Please see below for details.';
+				$this->mn_action = CWnd_INPUT_ERROR;
+			}
+		}
+
+		if ( $this->mn_action == CWnd_INPUT_GOOD && $this->mb_success )
+		{
+			CSql::query_and_free("DELETE FROM deleted_user WHERE user_id = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("INSERT INTO deleted_user (user_id, reason, created_tm) VALUES ('$s_name', '$s_reason', now())", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM dvdaf_user      WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM dvdaf_user_2    WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM dvdaf_user_3    WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_folder       WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_dvd          WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_dvd_2        WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_dvd_count    WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_dvd_merged   WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_groups       WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_rights       WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM my_vid_category WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM friend          WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM friend          WHERE friend_id  = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM microblog       WHERE user_id    = '$s_name'", 0,__FILE__,__LINE__);
+			CSql::query_and_free("DELETE FROM microblog       WHERE created_by = '$s_name'", 0,__FILE__,__LINE__);
+			$this->logoutUser();
+		}
+	}
+
+	function initStep_1()
+	{
+		if ( $this->mb_success )
+		{
+			$this->ma_fields = array(
+			'_title'	=> array('kind'	 => CWnd_DLG_KIND_TITLE,
+								 'flags' => 0,
+								 'label' => $this->ms_title),
+
+			'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' => "We are sorry to see you go.".
+											"<p>Your account has been successfully deleted.</p>"),
+
+			'enter'		=> array('kind'	 => CWnd_DLG_KIND_RESPONSE,
+								 'flags' => 0,
+								 'label' => '',
+								 'opt'   => array(array('type' => 'button', 'name' => 'ok', 'value' => 'Continue to homepage' , 'onclick' => "location.href=\"/\"")),
+								 'input' => CWnd_DLG_INPUT_BUTTONS));
+		}
+		else
+		{
+			$this->ma_fields = array(
+			'_title'	=> array('kind'	 => CWnd_DLG_KIND_TITLE,
+								 'flags' => 0,
+								 'label' => $this->ms_title),
+
+			'_id'		=> array('kind'  => CWnd_DLG_KIND_INFORM,
+								 'flags' => 0,
+								 'label' => "Sorry, we were not able to process your request.".
+											"<p>Your collection is not empty. Please delete all your titles and try again.</p>"),
+
+			'enter'		=> array('kind'	 => CWnd_DLG_KIND_RESPONSE,
+								 'flags' => 0,
+								 'label' => '',
+								 'opt'   => array(array('type' => 'button', 'name' => 'ok', 'value' => 'Continue to homepage' , 'onclick' => "location.href=\"/\"")),
+								 'input' => CWnd_DLG_INPUT_BUTTONS));
+		}
+	}
+}
+
+new CDelAccount;
+
+?>

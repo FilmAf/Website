@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+
+pwd >/var/www/html/a
+cd /var/www/html/p0; ls -lR  | awk '{print "p0/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/p1; ls -lR  | awk '{print "p1/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/p2; ls -lR  | awk '{print "p2/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/p3; ls -lR  | awk '{print "p3/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/p4; ls -lR  | awk '{print "p4/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/p5; ls -lR  | awk '{print "p5/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/p6; ls -lR  | awk '{print "p6/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/o0; ls -lR  | awk '{print "o0/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/o1; ls -lR  | awk '{print "o1/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/o2; ls -lR  | awk '{print "o2/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/o3; ls -lR  | awk '{print "o3/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/o4; ls -lR  | awk '{print "o4/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/o5; ls -lR  | awk '{print "o5/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/o6; ls -lR  | awk '{print "o6/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+cd /var/www/html/usr; ls -lR  | awk '{print "usr/" $1 "|" $5 "|" $9}' >> /var/www/html/a
+chmod 644 /var/www/html/a

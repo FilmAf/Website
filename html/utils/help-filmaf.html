@@ -1,0 +1,161 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndMenu.php';
+
+class CHelpFilmaf extends CWndMenu
+{
+	function constructor() // <<--------------------<< 1.0
+	{
+		parent::constructor();
+
+		$this->ms_include_css	   .=
+		"<style type='text/css'>".
+			".dh1 { color:#072b4b; font-size:12px; text-align:center; font-weight:bold; margin:24px 0 20px 0; }".
+			".dh1 p { font-size:11px; font-weight:normal; margin:12px 0 12px 0; }".
+			".dh1 img { padding:20px 0 10px 0; }".
+			".dh1 form { font-size:11px; font-weight:normal; margin-bottom:20px }".
+			".dh1 form p { margin:8px 0 8px 0; }".
+			".dh1 form img { padding:0; }".
+			".dh1 table { width:400px; margin-left:auto; margin-right:auto; }".
+			".dh1 table p { background:#ffffff; text-align:justify; }".
+			"#benefits { text-decoration:underline; }".
+		"</style>";
+	}
+
+	function getHeaderJavaScript() // <<-----------------------------<< 6.3
+	{
+		return
+		parent::getHeaderJavaScript().
+		"function donate()".
+		"{".
+			"if ( CheckBox.getVal_1('recurring') )".
+			"{".
+				"var s = '';".
+				"switch ( DropDown.getSelValue('os0') )".
+				"{".
+				"case 'Supporting Member': s='3831326'; break;".
+				"case 'Sponsor Member': s='3831730'; break;".
+				"case 'Donor Member': s='3831740'; break;".
+				"case 'Fellow Member': s='3831753'; break;".
+				"case 'Benefactor Member': s='3831766'; break;".
+				"case 'Patron': s='3831776'; break;".
+				"case 'Sponsor Patron': s='3831789'; break;".
+				"case 'Benefactor Patron': s='3831808'; break;".
+				"}".
+				"if ( s )".
+				"{".
+					"Edit.setStr('contrib_rec_opt', s);".
+					"$('contrib_rec').submit();".
+					"return;".
+				"}".
+			"}".
+			"$('contrib_once').submit();".
+		"};";
+	}
+
+	function drawBodyPage()
+	{
+		$n_step = dvdaf3_getvalue('step',DVDAF3_GET|DVDAF3_INT);
+
+		switch ( $n_step )
+		{
+		case 3:  $this->drawSucess(); break;
+		default: $this->drawSelect(); break;
+		}
+	}
+
+	function drawSucess()
+	{
+		echo
+		"<div>".
+		  "<div class='dh1'>Film Aficionado Star Members".
+			"<p>Thank you very much for your generous contribution!</p>".
+			"<table>".
+			  "<tr>".
+				"<td>".
+				  "<p>We are working on integrating everything toguether, meanwhile donations are processed manually as we ".
+				  "receive a notification from PayPal. It should take about 24 hours. You will receive an email from as as ".
+				  "we update your status. If that does not happen please contact us via dvdaf.net, twitter or paypal.</p>".
+				  "<p>Thank you very much for your generosity.</p>".
+				  "<p>- The Film Aficionado Team.</p>".
+				"</td>".
+			  "</tr>".
+			"</table>".
+		  "</div>".
+		"</div>";
+	}
+
+	function drawSelect()
+	{
+		echo
+		"<div style='padding:12px 12px 48px 12px;width:640px'>".
+		  "FilmAf will be ceasing activities on June 10, 2019.  As a consequence we are no longer accepting donations.  All donations made in 2019 have been refunded.  All recurring contributions have been discontinued.</br>&nbsp;</br>In nearly 20 years DVDAF and then FilmAf helped tens of thousands of people.  That is quite a run!  Unfortunately the economics have not been working for the past few years, and so it is time to call it.  We would like to thank you for all the work and dedication you have put into the site.  A special thanks to our moderators-extraordinaire, Greg and Anthony.  Thank you for a great journey.  Fair winds and following seas to all.".
+		"</div>";
+		/*
+		echo
+		"<div>".
+		  "<div class='dh1'>Film Aficionado Star Members".
+			"<form id='contrib_once' action='https://www.paypal.com/cgi-bin/webscr' method='post'>".
+			  "<p>Select your contribution level ".
+				"<select id='os0' name='os0'>".
+				  "<option value='Supporting Member'>Supporting Member $10.00</option>".
+				  "<option value='Sponsor Member' selected='selected'>Sponsor Member $20.00</option>".
+				  "<option value='Donor Member'>Donor Member $30.00</option>".
+				  "<option value='Fellow Member'>Fellow Member $50.00</option>".
+				  "<option value='Benefactor Member'>Benefactor Member $100.00</option>".
+				  "<option value='Patron'>Patron $200.00</option>".
+				  "<option value='Sponsor Patron'>Sponsor Patron $500.00</option>".
+				  "<option value='Benefactor Patron'>Benefactor Patron $1,000.00</option>".
+				"</select>".
+			  "</p>".
+			  "<p>".
+				"<input type='checkbox' id='recurring' /> Make it an on-going contribution (half the value every 6 months)".
+				"<input type='hidden' name='item_name ' value='".ucfirst($this->ms_user_id)." contribution in support of Film Aficionado' />".
+				"<input type='hidden' name='cmd' value='_s-xclick' />".
+				"<input type='hidden' name='hosted_button_id' value='3829744' />".
+				"<input type='hidden' name='on0' value='Select your contribution level' /><br />".
+			  "</p>".
+			  "<p>".
+				"<input type='hidden' name='currency_code' value='USD' />".
+				"<img src='http://dv1.us/d1/00/donate.gif' onclick='donate()' alt='PayPal - The safer, easier way to pay online!' />".
+				"<img border='0' src='https://www.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1' />".
+			  "</p>".
+			  "<p>No Paypal account needed".
+			  "<br/><a id='benefits' href='/utils/benefits.html'>Star Membership Benefits</a></p>".
+			"</form>".
+
+			"<form id='contrib_rec' action='https://www.paypal.com/cgi-bin/webscr' method='post'>".
+			  "<input type='hidden' name='item_name ' value='".ucfirst($this->ms_user_id)." recurring contribution in support of Film Aficionado' />".
+			  "<input type='hidden' name='cmd' value='_s-xclick' />".
+			  "<input type='hidden' id='contrib_rec_opt' name='hosted_button_id' value='3831326' />".
+			  "<img border='0' src='https://www.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1' />".
+			"</form>".
+		  "</div>".
+
+		  "<div class='dh1'>Instructions".
+			"<table>".
+			  "<tr>".
+				"<td>".
+				  "<p>Once you hit the &quot;Donate&quot; button you will a screen similar to the one below. The blue arrows show you the options for you to use either a credit card or your paypal account.</p>".
+				  "<p>Thank you for making Film Aficionado possible!</p>".
+				"</td>".
+			  "</tr>".
+			"</table>".
+			"<img src='http://dv1.us/tut/paypal.gif' />".
+		  "</div>".
+		"</div>";
+		*/
+	}
+}
+
+new CHelpFilmaf;
+
+?>

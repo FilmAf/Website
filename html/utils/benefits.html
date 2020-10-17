@@ -1,0 +1,135 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWndMenu.php';
+
+class CBenefits extends CWndMenu
+{
+	function constructor() // <<--------------------<< 1.0
+	{
+		parent::constructor();
+
+		$this->ms_include_css	   .=
+		"<style type='text/css'>".
+			".dh1 { color:#072b4b; font-size:12px; text-align:center; font-weight:bold; margin:24px 0 20px 0; }".
+			".dh1 p { font-size:11px; font-weight:normal; margin:12px 0 12px 0; }".
+			".dh1 img { padding:20px 0 10px 0; }".
+			".dh1 form { font-size:11px; font-weight:normal; margin-bottom:20px }".
+			".dh1 form p { margin:8px 0 8px 0; }".
+			".dh1 form img { padding:0; }".
+			".dh1 table { width:400px; margin-left:auto; margin-right:auto; }".
+			".dh1 table p { background:#ffffff; text-align:justify; }".
+			"#benefits table { background:#ffffff; }".
+			"#benefits td { color:#3E719E; padding:0 4px 0 16px; vertical-align:top; }".
+			"#benefits .section { color:#005e0d; font-size:12px; padding:30px 0 12px 0; }".
+			"#benefits ul { padding:4px 0 4px 24px; }".
+			"#benefits img { position:relative; top:3px; }".
+			"#benenote { color:#96a0a9; padding:30px 80px 20px 80px; text-align:justify; }".
+			"#benenote p { margin:8px 0 8px 0; }".
+			"#benenote span { text-decoration:underline; }".
+		"</style>";
+	}
+
+	function drawBodyPage()
+	{
+		echo
+		"<div>".
+		  "<div class='dh1'>Film Aficionado Star Members".
+			"<div><a href='/utils/help-filmaf.html'><img src='http://dv1.us/d1/00/donate.gif' /></a></div>".
+			"<div>No Paypal account needed</div>".
+			"<p>Star Members are people like you who take a more active<br />role in supporting Film Aficionado with donations and content</p>".
+			"<p>In appreciation, Star Members receive the following benefits</p>".
+		  "</div>".
+
+		  "<div id='benefits'>".
+			"<table>".
+			  "<tr>".
+				"<td width='50%'>".
+				  "<div class='section'>Guest</div>".
+				  "<div>Free for all</div><div>Privileges:</div><ul>".
+					"<li>Access to the largest DVD database on the Internet</li>".
+					"<li>Powerful research tools</li>".
+					"<li>Price comparison engine.</li>".
+				"</ul></td><td width='50%'>".
+				  "<div class='section'>Member</div>".
+				  "<div>Free for all</div><div>Privileges - To Guests add:</div><ul>".
+					"<li>Best home on the net for DVD Collections and Wish Lists.</li>".
+					"<li>Limit of search results raised from 1,000 to 10,000</li>".
+				"</ul></td></tr><tr><td>".
+				  "<div class='section'>Supporting Member <img src='http://dv1.us/st/smb1.gif' /></div>".
+				  "<div>$10 contribution</div><div>Privileges - To Member add:</div><ul>".
+					"<li>Higher Resolution Pictures</li>".
+					"<li>Limit of listings per page raised from 200 to 500</li>".
+				"</ul></td><td>".
+				  "<div class='section'>Sponsor Member <img src='http://dv1.us/st/smb3.gif' /></div>".
+				  "<div>$20 contribution</div><div>Privileges - To Supporting Member add:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+				"</ul></td></tr><tr><td>".
+				  "<div class='section'>Donor Member <img src='http://dv1.us/st/smb4.gif' /></div>".
+				  "<div>$30 contribution</div><div>Privileges - To Sponsor Member add:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+					"<li>Limit of listings per page raised from 500 to 1,000</li>".
+				"</ul></td><td>".
+				  "<div class='section'>Fellow Member <img src='http://dv1.us/st/smb5.gif' /></div>".
+				  "<div>$50 contribution</div><div>Privileges:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+				"</ul></td></tr><tr><td>".
+				  "<div class='section'>Charter Member <img src='http://dv1.us/st/smb5.gif' /></div>".
+				  "<div>Reserved to a small number of members who have demonstrated a generous level of support when we were just starting.</div><div>Privileges:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+				"</ul></td><td>".
+				  "<div class='section'>Benefactor Member <img src='http://dv1.us/st/smb6.gif' /></div>".
+				  "<div>$100 contribution</div><div>Privileges:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+				"</ul></td></tr><tr><td>".
+				  "<div class='section'>Patron <img src='http://dv1.us/st/smb7.gif' /></div>".
+				  "<div>$200 contribution</div><div>Privileges:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+				"</ul></td><td>".
+				  "<div class='section'>Sponsor Patron <img src='http://dv1.us/st/smb8.gif' /></div>".
+				  "<div>$500 contribution</div><div>Privileges:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+				"</ul></td></tr><tr><td>".
+				  "<div class='section'>Benefactor Patron <img src='http://dv1.us/st/smb9.gif' /></div>".
+				  "<div>$1,000 contribution</div><div>Privileges:</div><ul>".
+					"<li>Priority Submission Processing</li>".
+				"</ul></td>".
+				"<td>&nbsp;</td>".
+			  "</tr>".
+			"</table>".
+
+			"<div id='benenote'>".
+			  "<p>Membership levels of Supporting Member and above are good for 12 months and are ".
+			  "recognized at their collection screens and on the <a href='/thank-you.html'>Friends ".
+			  "of Film Aficionado</a> list.</p>".
+
+			  "<p><span>Higher Resolution Pictures</span>: Ability see larger resolution ".
+			  "pictures in 'one pager' mode for collections and searches. This privilege will also ".
+			  "be extend to guests and other members when they are viewing your collection -- i.e. ".
+			  "they will always see the larger pictures when looking at your collection.</p>".
+
+			  "<p><span>Genre Overwrite</span>: Ability to change in your collection the ".
+			  "genre classification of a title (e.g. action adventure to comedy to sci-fi, etc.)</p>".
+
+			  "<p><span>Priority Submission Processing</span>: Submissions from these ".
+			  "members will be processed first.</p>".
+
+			  "<p>Your help makes Film Aficionado possible and is greatly appreciated!</p>".
+
+			  "<p>-The Film Aficionado Team</p>".
+			"</div>".
+		  "</div>".
+		"</div>";
+	}
+}
+
+new CBenefits;
+
+?>

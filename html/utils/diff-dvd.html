@@ -1,0 +1,226 @@
+<?php
+
+/* ---------------------------------------------------------------------------- *\
+ *  Film Aficionado is public domain software. Promotional material images,
+ *  if present, are copyrighted by the respective copyright owners and should
+ *  only be used under the provisions dictated by those copyright holders.
+ *  There are no warranties expressed on implied.
+\* ---------------------------------------------------------------------------- */
+
+require 'identify.php';
+require $gs_root.'/lib/CWnd.php';
+
+function getPicLocation($s_pic_name,$b_thumbs)
+{
+	$n = strpos($s_pic_name,'-');
+	if ( $n <= 2 ) $n = strpos($s_pic_name,'.');
+	if ( $n > 2 )
+	{
+		$c = intval($s_pic_name{$n - 1});
+		$c = $c <= 1 ? '' : ($c <= 4 ? 'a.' : ($c <= 6 ? 'b.' : 'c.'));
+		return "http://{$c}dv1.us/p". ($b_thumbs ? '0' : '1') ."/". substr($s_pic_name, $n - 3, 3);
+	}
+	return '';
+}
+
+
+class CDvdDiff extends CWnd
+{
+	function constructor() // <<--------------------------------<< 1.0
+	{
+		CWnd::constructor();
+		$this->ms_title				= 'Film Aficionado Diff DVD';
+		$this->mb_get_user_status	= true;
+	}
+
+	function drawBodyPage()
+	{
+		if ( ! $this->mb_mod )
+		{
+			$this->ms_display_error = "This function is only available to Moderators.";
+			$this->drawMessages(true,false);
+			return;
+		}
+
+		$n_dvd_a = dvdaf3_getvalue('a', DVDAF3_GET|DVDAF3_INT);
+		$n_dvd_b = dvdaf3_getvalue('b', DVDAF3_GET|DVDAF3_INT);
+
+		echo  "<h1>Diff DVD</h1>";
+
+		if ( $n_dvd_a == 0 || $n_dvd_b == 0 )
+		{
+			$s_url  = dvdaf3_getvalue('SCRIPT_URL',DVDAF3_SERVER);
+
+			echo  "<div style='margin:20px'>".
+					"<form action='{$s_url}' method='get'>".
+					  "<table class='no_border' style='margin:20px 0 20px 0'>".
+						"<tr>".
+						  "<td style='padding:2px'>a:</td>".
+						  "<td style='padding:2px'><input type='text' name='a' /></td>".
+						  "<td style='padding:2px'>&nbsp;</td>".
+						"</tr>".
+						"<tr>".
+						  "<td style='padding:2px'>b:</td>".
+						  "<td style='padding:2px'><input type='text' name='b' /></td>".
+						  "<td style='padding:2px'><input type='submit' name='go' value='Submit' /></td>".
+						"</tr>".
+					  "</table>".
+					"</form>".
+				  "</div>";
+			return;
+		}
+
+		$ss = "SELECT dvd_id, version_id, dvd_title, film_rel_year, director, publisher, orig_language, country, country_block, region_mask, genre, ".
+					 "media_type, num_titles, num_disks, source, rel_status, film_rel_dd, dvd_rel_dd, dvd_oop_dd, imdb_id, pic_status, pic_name, ".
+					 "pic_count, list_price, sku, upc, asin, amz_country, best_price, amz_rank, collection_rank, dvd_created_tm, dvd_updated_tm, ".
+					 "dvd_updated_by, dvd_id_merged, last_justify, dvd_verified_tm, dvd_verified_by, verified_version, dvd_edit_id, creation_seed ".
+				"FROM dvd ".
+			   "WHERE dvd_id = ";
+
+		$this->a = CSql::query_and_fetch($ss.$n_dvd_a,0,__FILE__,__LINE__);
+		$this->b = CSql::query_and_fetch($ss.$n_dvd_b,0,__FILE__,__LINE__);
+
+		if ( ! $this->a )
+		{
+			echo  "<div style='margin:20px'>DVD {$n_dvd_a} not found.</div>";
+			return;
+		}
+
+		if ( ! $this->b )
+		{
+			echo  "<div style='margin:20px'>DVD {$n_dvd_b} not found.</div>";
+			return;
+		}
+
+		$this->a['region_mask'] = $this->decodeRegion($this->a['region_mask']);
+		$this->b['region_mask'] = $this->decodeRegion($this->b['region_mask']);
+
+		echo "<table border='1' cellspacing='1'>".
+			  "<tr>".
+				"<td class='es'>Comparing</td>".
+				"<td class='es'>{$this->a['dvd_id']} version {$this->a['version_id']}</td>".
+				"<td class='es'>{$this->b['dvd_id']} version {$this->b['version_id']}</td>".
+			  "</tr>";
+		$this->echoDiff('dvd_title'			,'Title');
+		$this->echoDiff('film_rel_year'		,'Film release year');
+		$this->echoDiff('film_rel_dd'		,'Film release date');
+		$this->echoDiff('orig_language'		,'Original language');
+		$this->echoDiff('genre'				,'Genre');
+		$this->echoDiff('source'			,'Source');
+		$this->echoDiff('media_type'		,'Media type');
+		$this->echoDiff('region_mask'		,'Region');
+		$this->echoDiff('country'			,'DVD Country');
+//		$this->echoDiff('country_block'		,'country_block');
+		$this->echoDiff('rel_status'		,'DVD release status');
+		$this->echoDiff('dvd_rel_dd'		,'DVD release date');
+		$this->echoDiff('dvd_oop_dd'		,'Out of print date');
+		$this->echoDiff('asin'				,'Amazon ASIN');
+		$this->echoDiff('amz_country'		,'Amazon Country');
+//		$this->echoDiff('amz_rank'			,'amz_rank');
+//		$this->echoDiff('collection_rank'	,'collection_rank');
+		$this->echoDiff('imdb_id'			,'Imdb links');
+		$this->echoDiff('director'			,'Director');
+		$this->echoDiff('publisher'			,'DVD Publisher');
+		$this->echoDiff('num_titles'		,'Number of titles');
+		$this->echoDiff('num_disks'			,'Number of disks');
+		$this->echoDiff('upc'				,'UPC');
+		$this->echoDiff('sku'				,'Studio product code');
+		$this->echoDiff('list_price'		,'List price');
+		$this->echoDiff('best_price'		,'Best price');
+		$this->echoDiff('pic_status'		,'Picture status');
+//		$this->echoDiff('pic_name'			,'pic_name');
+		$this->echoDiff('pic_count'			,'Picture count');
+		$this->echoDiff('dvd_created_tm'	,'Created on');
+		$this->echoDiff('dvd_updated_tm'	,'Last updated on');
+		$this->echoDiff('dvd_updated_by'	,'Last updated by');
+		$this->echoDiff('last_justify'		,'Update justification');
+		$this->echoDiff('verified_version'	,'Last verified version');
+		$this->echoDiff('dvd_verified_tm'	,'Verified on');
+		$this->echoDiff('dvd_verified_by'	,'Verified by');
+//		$this->echoDiff('dvd_id_merged'		,'dvd_id_merged');
+//		$this->echoDiff('dvd_edit_id'		,'dvd_edit_id');
+//		$this->echoDiff('creation_seed'		,'creation_seed');
+
+		echo  "<tr>".
+				"<td>&nbsp;</td>".
+				"<td style='padding:4px;text-align:center'><a href='/utils/x-dvd-edit.html?dvd={$n_dvd_a}' target='edit'>EDIT</a></td>".
+				"<td style='padding:4px;text-align:center'><a href='/utils/x-dvd-edit.html?dvd={$n_dvd_b}' target='edit'>EDIT</a></td>".
+			  "</tr>";
+
+		if ( $this->ms_user_id == 'ash' )
+		{
+			echo
+			  "<tr>".
+				"<td>&nbsp;</td>".
+				"<td style='padding:4px;text-align:center'><a href='/utils/merge-dvd.html?keep={$n_dvd_b}&del={$n_dvd_a}'>DELETE</a></td>".
+				"<td style='padding:4px;text-align:center'><a href='/utils/merge-dvd.html?keep={$n_dvd_a}&del={$n_dvd_b}'>DELETE</a></td>".
+			  "</tr>";
+		}
+
+		echo  "<tr>".
+				"<td class='oi' style='padding:1px 2px 1px 2px'>&nbsp;</td>".
+				"<td style='padding:1px 2px 1px 2px'>";
+				  $this->echoPics($n_dvd_a);
+		echo	"</td>".
+				"<td style='padding:1px 2px 1px 2px'>";
+				  $this->echoPics($n_dvd_b);
+		echo	"</td>".
+			  "</tr>".
+			"</table>";
+	}
+
+	function echoDiff($s_field, $s_label)
+	{
+		$b_same   = $this->a[$s_field] == $this->b[$s_field];
+		$s_color1 = $b_same ? 'blue' : 'red';
+		$s_color2 = $b_same ? '#aaaaaa' : 'red';
+		$s_value2 = $b_same ? 'same value' : $this->b[$s_field];
+		echo  "<tr>".
+				"<td class='oi' style='padding:1px 2px 1px 2px'>{$s_label}</td>".
+				"<td style='padding:1px 2px 1px 2px;color:{$s_color1}'>{$this->a[$s_field]}</td>".
+				"<td style='padding:1px 2px 1px 2px;color:{$s_color2}'>{$s_value2}</td>".
+			  "</tr>";
+	}
+
+	function echoPics($n_dvd_id)
+	{
+		if ( ($rr = CSql::query("SELECT a.pic_id, a.pic_name, a.version_id, a.sub_version_id, a.pic_uploaded_tm, a.pic_uploaded_by, ".
+									   "a.pic_edited_tm, a.pic_edited_by, a.pic_verified_tm, a.pic_verified_by FROM pic a, dvd_pic b ".
+								 "WHERE b.dvd_id = {$n_dvd_id} and a.pic_id = b.pic_id ORDER BY b.sort_order",0,__FILE__,__LINE__)) )
+		{
+			while ( ($ln = CSql::fetch($rr)) )
+			{
+				$s_src = getPicLocation($ln['pic_name'], false). '/' . $ln['pic_name'] . '.jpg';
+				echo  "<div>".
+						"<img src='{$s_src}' />".
+						"<div>Picture <span style='color:blue'>{$ln['pic_id']}</span>, version <span style='color:blue'>{$ln['version_id']}</span>.<span style='color:blue'>{$ln['sub_version_id']}</span></div>".
+						"<div>Uploaded on <span style='color:blue'>{$ln['pic_uploaded_tm']}</span> by <span style='color:blue'>{$ln['pic_uploaded_by']}</span>.</div>".
+						"<div>Edited on <span style='color:blue'>{$ln['pic_edited_tm']}</span> by <span style='color:blue'>{$ln['pic_edited_by']}</span>.</div>".
+						"<div>Verified on <span style='color:blue'>{$ln['pic_verified_tm']}</span> by <span style='color:blue'>{$ln['pic_verified_by']}</span>.</div>".
+					  "</div>";
+			}
+			CSql::free($rr);
+		}
+	}
+
+	function decodeRegion($n)
+	{
+		$n = intval($n);
+		$s = '';
+		if ($n &   1) { $s .= '0,'; $n = $n &   ~1; }
+		if ($n &   2) { $s .= '1,'; $n = $n &   ~2; }
+		if ($n &   4) { $s .= '2,'; $n = $n &   ~4; }
+		if ($n &   8) { $s .= '3,'; $n = $n &   ~8; }
+		if ($n &  16) { $s .= '4,'; $n = $n &  ~16; }
+		if ($n &  32) { $s .= '5,'; $n = $n &  ~32; }
+		if ($n &  64) { $s .= '6,'; $n = $n &  ~64; }
+		if ($n & 128) { $s .= 'A,'; $n = $n & ~128; }
+		if ($n & 256) { $s .= 'B,'; $n = $n & ~256; }
+		if ($n & 512) { $s .= 'C,'; $n = $n & ~512; }
+		return substr($s,0,-1);
+	}
+}
+
+new CDvdDiff;
+
+?>

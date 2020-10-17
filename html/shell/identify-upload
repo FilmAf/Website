@@ -1,0 +1,47 @@
+#!/bin/bash
+
+function echo_usage {
+    echo ""
+    echo "This script (identify-upload) will check on the image format and size and if appropriate generate a corresponding high quality jpg."
+    echo ""
+    if [ "$1" != '' ]; then
+	echo "ERROR:"
+	echo "    $1"
+	echo ""
+    fi
+    echo "Usage:"
+    echo "    $0 source target '/usr/local/bin/identify -format '%m %w %h' source'"
+    echo ""
+    echo "Source:"
+    echo "    Source full filename including path and extension"
+    echo ""
+    echo "Target:"
+    echo "    Target full filename including path and extension"
+    echo ""
+    exit
+}
+
+function get_int {
+    echo `echo "$1" | sed -n '/^-\?[0-9]\+$/p'`
+}
+
+if [ "$#" != 5 ]; then
+    echo_usage
+fi
+
+if [ ! -f "$1" ]; then
+    echo_usage "Input file $1 not found"
+fi
+
+case "$3" in
+"JPEG") ;;
+"GIF" ) ;;
+"BMP" ) ;;
+"PNG" ) ;;
+*     ) echo_usage "$3 is not a supported image type"; ;;
+esac
+
+convert $1 -quality 90 $2
+chmod 666 $2 2> /dev/null
+
+echo SUCCESS $4 $5
